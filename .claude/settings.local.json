@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(@claude code add mcp server --name mcp-docs-demo --command \"node\" --args \"D:/dev/myGithub/mcp-docs-demo/dist/server.js\")",
+      "Read(//c/Users/**)",
+      "mcp__ide__getDiagnostics",
+      "Bash(node:*)",
+      "Bash(claude mcp:*)",
+      "Bash(npm run build:*)",
+      "Bash(claude doctor)",
+      "Bash(grep:*)",
+      "Bash(claude code add mcp server --name mcp-docs-demo --command \"node\" --args \"D:/dev/myGithub/mcp-docs-demo/dist/server.js\")",
+      "Bash(claude code mcp --help)",
+      "Bash(mkdir:*)",
+      "Bash(find:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm install:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
