@@ -31,7 +31,7 @@ interface CodeExample {
 }
 
 // Initialize the doc indexer
-const docsPath = join(process.cwd(), 'docs');
+const docsPath = join(__dirname, '../../docs');
 const docIndexer = new DocIndexer(docsPath);
 let indexedDocs: IndexedDocs;
 
@@ -127,10 +127,28 @@ export const getFusionKitPackages = async (packageName?: string): Promise<Record
   
   // Extract package information from indexed docs
   for (const section of packageSections) {
-    if (section.level === 1 && section.title.startsWith('fusion-kit-')) {
-      const packageKey = section.title;
-      const description = section.content.split('\n')[0] || 'FusionKit package';
-      packages[packageKey] = description;
+    if (section.level === 1) {
+      const title = section.title.toLowerCase();
+      // Match various title formats for packages
+      if (title.startsWith('fusion-kit-') || title.includes('fusion kit')) {
+        let packageKey = section.title;
+        
+        // Normalize package keys to consistent format
+        if (title.includes('cli')) {
+          packageKey = 'fusion-kit-cli';
+        } else if (title.includes('module federation')) {
+          packageKey = 'fusion-kit-module-federation';
+        } else if (title.includes('contracts')) {
+          packageKey = 'fusion-kit-contracts';
+        } else if (title.includes('keycloak')) {
+          packageKey = 'fusion-kit-keycloak';
+        } else if (title.includes('core')) {
+          packageKey = 'fusion-kit-core';
+        }
+        
+        const description = section.content.split('\n')[0] || 'FusionKit package';
+        packages[packageKey] = description;
+      }
     }
   }
   

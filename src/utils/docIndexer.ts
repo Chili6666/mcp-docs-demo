@@ -157,7 +157,7 @@ export class DocIndexer {
     
     for (const line of lines) {
       // Check if line is a markdown heading (# ## ### etc.)
-      const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+      const headingMatch = line.trim().match(/^(#{1,6})\s+(.+)$/);
       
       if (headingMatch) {
         // Save the previous section if it exists
