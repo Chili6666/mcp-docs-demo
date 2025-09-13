@@ -15,7 +15,7 @@ const inputSchema = {
   },
   framework: {
     type: 'string',
-    description: 'Framework for the code examples: "angular", "react", "vue", or "vanilla". Defaults to "angular" if not specified',
+    description: 'Framework for the code examples: "angular", "react", "vue", or "vanilla". Defaults to "react" if not specified',
     optional: true,
   },
 };
@@ -25,8 +25,7 @@ export const getCodeExamplesTool = {
   name: 'getCodeExamples',
   description: 'Get code examples for different use cases and frameworks',
   inputSchema,
-  execute: async (args: any) => {
-    const { useCase, framework = 'angular' } = args as GetCodeExamplesParams;
+  execute: async ({ useCase, framework = 'react' }: GetCodeExamplesParams) => {
     try {
       const example = await getCodeExamples(useCase, framework);
       return createResponse(JSON.stringify(example));

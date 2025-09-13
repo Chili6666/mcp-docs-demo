@@ -25,8 +25,7 @@ export const getPackageDocumentationTool = {
   name: 'getPackageDocumentation',
   description: 'Get documentation for specific packages',
   inputSchema,
-  execute: async (args: any) => {
-    const { packageName, section = 'all' } = args as GetPackageDocumentationParams;
+  execute: async ({ packageName, section = 'all' }: GetPackageDocumentationParams) => {
     try {
       const docs = await getPackageDocumentation(packageName, section);
       return createResponse(JSON.stringify(docs));

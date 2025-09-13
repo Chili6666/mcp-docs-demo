@@ -20,8 +20,7 @@ export const getFusionKitOverviewTool = {
   name: 'getFusionKitOverview',
   description: 'Get overview information about FusionKit including introduction, key benefits, quick start guide, and deployment scenarios',
   inputSchema,
-  execute: async (args: any) => {
-    const { section = 'all' } = args as GetFusionKitOverviewParams;
+  execute: async ({ section = 'all' }: GetFusionKitOverviewParams) => {
     try {
       const overview = await getFusionKitOverview(section);
       return createResponse(JSON.stringify(overview));

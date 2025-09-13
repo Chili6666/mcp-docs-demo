@@ -137,14 +137,14 @@ export const getCodeExamples = async (useCase: string, framework?: string): Prom
     }
   };
 
-  const useFramework = framework || 'angular';
+  const useFramework = framework || 'react';
   const exampleSet = examples[useCase];
 
   if (!exampleSet) {
     throw new Error(`No examples found for use case "${useCase}"`);
   }
 
-  const example = exampleSet[useFramework] || exampleSet['angular'] || Object.values(exampleSet)[0];
+  const example = exampleSet[useFramework] || exampleSet['react'] || Object.values(exampleSet)[0];
 
   return {
     useCase,

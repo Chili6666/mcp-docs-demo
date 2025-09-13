@@ -20,8 +20,7 @@ export const getFusionKitPackagesTool = {
   name: 'getFusionKitPackages',
   description: 'Get information about FusionKit packages including core, CLI, contracts, keycloak, and module-federation packages',
   inputSchema,
-  execute: async (args: any) => {
-    const { packageName } = args as GetFusionKitPackagesParams;
+  execute: async ({ packageName }: GetFusionKitPackagesParams) => {
     try {
       const packages = await getFusionKitPackages(packageName);
       return createResponse(JSON.stringify(packages));
