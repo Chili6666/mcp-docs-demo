@@ -1,4 +1,4 @@
-import { createResponse, createError } from '../helper/utils';
+import { createResponse, createError } from '../utils/serverutils.js';
 import { getFusionKitOverview } from './documentationTools';
 
 // Type definition
@@ -20,7 +20,8 @@ export const getFusionKitOverviewTool = {
   name: 'getFusionKitOverview',
   description: 'Get overview information about FusionKit including introduction, key benefits, quick start guide, and deployment scenarios',
   inputSchema,
-  execute: async ({ section = 'all' }: GetFusionKitOverviewParams) => {
+  execute: async (args: any) => {
+    const { section = 'all' } = args as GetFusionKitOverviewParams;
     try {
       const overview = await getFusionKitOverview(section);
       return createResponse(JSON.stringify(overview));

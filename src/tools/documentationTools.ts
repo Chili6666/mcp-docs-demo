@@ -1,4 +1,6 @@
 // FusionKit Documentation Tools
+import { join } from 'path';
+import { DocIndexer, IndexedDocs } from '../utils/docIndexer.js';
 
 interface FusionKitOverview {
   introduction: string;
@@ -28,12 +30,82 @@ interface CodeExample {
   code: string;
 }
 
+// Initialize the doc indexer
+const docsPath = join(process.cwd(), 'docs');
+const docIndexer = new DocIndexer(docsPath);
+let indexedDocs: IndexedDocs;
+
+// Initialize docs on first use
+const getIndexedDocs = (): IndexedDocs => {
+  if (!indexedDocs) {
+    indexedDocs = docIndexer.indexDocs();
+  }
+  return indexedDocs;
+};
+
+// Helper function to extract list items from markdown content
+const extractListItems = (content: string): string[] => {
+  const lines = content.split('\n');
+  const items: string[] = [];
+  
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+      items.push(trimmed.substring(2).replace(/\*\*(.*?)\*\*/g, '$1').trim());
+    }
+  }
+  
+  return items.length > 0 ? items : [];
+};
+
+// Helper function to extract code blocks from markdown content
+const extractCodeBlocks = (content: string): string[] => {
+  const codeBlocks: string[] = [];
+  const lines = content.split('\n');
+  let inCodeBlock = false;
+  let currentBlock: string[] = [];
+  
+  for (const line of lines) {
+    if (line.trim().startsWith('```')) {
+      if (inCodeBlock) {
+        // End of code block
+        if (currentBlock.length > 0) {
+          codeBlocks.push(currentBlock.join('\n'));
+        }
+        currentBlock = [];
+        inCodeBlock = false;
+      } else {
+        // Start of code block
+        inCodeBlock = true;
+      }
+    } else if (inCodeBlock) {
+      currentBlock.push(line);
+    }
+  }
+  
+  // Handle unclosed code block
+  if (inCodeBlock && currentBlock.length > 0) {
+    codeBlocks.push(currentBlock.join('\n'));
+  }
+  
+  return codeBlocks;
+};
+
 export const getFusionKitOverview = async (section?: string): Promise<FusionKitOverview | Partial<FusionKitOverview>> => {
+  const docs = getIndexedDocs();
+  const overviewSections = docs.overview;
+  
+  // Extract key information from indexed content
+  const introSection = overviewSections.find(s => s.title.toLowerCase().includes('what is fusionkit'));
+  const benefitsSection = overviewSections.find(s => s.title.toLowerCase().includes('key benefits'));
+  const quickStartSection = overviewSections.find(s => s.title.toLowerCase().includes('quick start'));
+  const deploymentSection = overviewSections.find(s => s.title.toLowerCase().includes('deployment scenarios'));
+  
   const overview: FusionKitOverview = {
-    introduction: 'FusionKit is a comprehensive foundational library designed to standardize and streamline the development of both standalone applications and microfrontend applications.',
-    keyBenefits: ['Standardization', 'Microfrontend Enablement', 'Reduced Development Time', 'Enhanced Security', 'Framework Agnostic'],
-    quickStart: 'Install globally: npm install -g @inform-appshell/fusion-kit-cli@latest, then create a new microfrontend: fk create mfe -n my-app',
-    deploymentScenarios: ['Standalone Applications', 'Microfrontends in a Shell']
+    introduction: introSection?.content || 'No introduction found in documentation',
+    keyBenefits: benefitsSection ? extractListItems(benefitsSection.content) : [],
+    quickStart: quickStartSection?.content || 'No quick start guide found in documentation',
+    deploymentScenarios: deploymentSection ? extractListItems(deploymentSection.content) : []
   };
 
   if (!section || section === 'all') {
@@ -48,13 +120,24 @@ export const getFusionKitOverview = async (section?: string): Promise<FusionKitO
 };
 
 export const getFusionKitPackages = async (packageName?: string): Promise<Record<string, string> | { [key: string]: string }> => {
-  const packages: Record<string, string> = {
-    'fusion-kit-core': 'Core foundational services and utilities for FusionKit applications',
-    'fusion-kit-cli': 'Command-line interface for creating and managing FusionKit applications',
-    'fusion-kit-contracts': 'Type definitions and contracts for FusionKit services',
-    'fusion-kit-keycloak': 'Keycloak integration services for authentication and authorization',
-    'fusion-kit-module-federation': 'Module federation utilities for microfrontend architecture'
-  };
+  const docs = getIndexedDocs();
+  const packageSections = docs.packages;
+  
+  const packages: Record<string, string> = {};
+  
+  // Extract package information from indexed docs
+  for (const section of packageSections) {
+    if (section.level === 1 && section.title.startsWith('fusion-kit-')) {
+      const packageKey = section.title;
+      const description = section.content.split('\n')[0] || 'FusionKit package';
+      packages[packageKey] = description;
+    }
+  }
+  
+  // If no packages found in docs, return empty object
+  if (Object.keys(packages).length === 0) {
+    throw new Error('No package documentation found in indexed content');
+  }
 
   if (packageName) {
     const key = `fusion-kit-${packageName}`;
@@ -70,111 +153,151 @@ export const getFusionKitPackages = async (packageName?: string): Promise<Record
 };
 
 export const getPackageDocumentation = async (packageName: string, section?: string): Promise<PackageDocumentation | Partial<PackageDocumentation>> => {
-  const packageDocs: Record<string, PackageDocumentation> = {
-    core: {
-      overview: 'FusionKit Core provides foundational services including configuration management, logging, and service orchestration',
-      installation: 'npm install @inform-appshell/fusion-kit-core',
-      api: 'Main exports: ConfigService, LoggingService, ServiceRegistry',
-      examples: 'Example: const config = new ConfigService(); config.get("apiUrl");'
-    },
-    cli: {
-      overview: 'Command-line tool for scaffolding and managing FusionKit applications',
-      installation: 'npm install -g @inform-appshell/fusion-kit-cli@latest',
-      api: 'Commands: create, build, serve, test',
-      examples: 'fk create mfe -n my-microfrontend'
-    },
-    contracts: {
-      overview: 'TypeScript definitions and service contracts for FusionKit ecosystem',
-      installation: 'npm install @inform-appshell/fusion-kit-contracts',
-      api: 'Exports interfaces for all FusionKit services',
-      examples: 'import { IConfigService } from "@inform-appshell/fusion-kit-contracts";'
-    },
-    keycloak: {
-      overview: 'Keycloak integration for authentication and authorization in FusionKit apps',
-      installation: 'npm install @inform-appshell/fusion-kit-keycloak',
-      api: 'KeycloakService, AuthGuard, TokenInterceptor',
-      examples: 'const auth = new KeycloakService(); auth.login();'
-    },
-    'module-federation': {
-      overview: 'Webpack Module Federation utilities for microfrontend architecture',
-      installation: 'npm install @inform-appshell/fusion-kit-module-federation',
-      api: 'ModuleFederationPlugin, RemoteService',
-      examples: 'Configure webpack with ModuleFederationPlugin for dynamic imports'
-    }
-  };
-
-  const docs = packageDocs[packageName];
-  if (!docs) {
+  const docs = getIndexedDocs();
+  const packageSections = docs.packages;
+  
+  // Find the package file sections
+  const packageFileName = `fusion-kit-${packageName}`;
+  const packageFileSections = packageSections.filter(s => 
+    s.filePath.toLowerCase().includes(packageFileName.toLowerCase()) ||
+    s.filePath.toLowerCase().includes(packageName.toLowerCase())
+  );
+  
+  if (packageFileSections.length === 0) {
     throw new Error(`Documentation for package "${packageName}" not found`);
   }
+  
+  // Extract different sections of documentation
+  const overviewSection = packageFileSections.find(s => 
+    s.title.toLowerCase().includes('purpose') || 
+    s.level === 1 ||
+    s.content.length > 100
+  );
+  
+  const installationContent = packageFileSections.find(s => 
+    s.content.includes('npm install') || 
+    s.content.includes('install')
+  )?.content.match(/npm install[^\n]*/)?.[0] || 'Installation instructions not found in documentation';
+  
+  const apiSection = packageFileSections.find(s => 
+    s.title.toLowerCase().includes('api') ||
+    s.title.toLowerCase().includes('interface') ||
+    s.title.toLowerCase().includes('features')
+  );
+  
+  const exampleSection = packageFileSections.find(s => 
+    s.title.toLowerCase().includes('example') ||
+    s.title.toLowerCase().includes('usage') ||
+    s.content.includes('```')
+  );
+  
+  const packageDoc: PackageDocumentation = {
+    overview: overviewSection?.content || 'Package overview not found in documentation',
+    installation: installationContent,
+    api: apiSection?.content || 'API documentation not found',
+    examples: exampleSection?.content || 'Examples not found in documentation'
+  };
 
   if (!section || section === 'all') {
-    return docs;
+    return packageDoc;
   }
 
-  if (section in docs) {
-    return { [section]: docs[section as keyof PackageDocumentation] };
+  if (section in packageDoc) {
+    return { [section]: packageDoc[section as keyof PackageDocumentation] };
   }
 
   throw new Error(`Section "${section}" not found for package "${packageName}"`);
 };
 
 export const getCodeExamples = async (useCase: string, framework?: string): Promise<CodeExample> => {
-  const examples: Record<string, Record<string, string>> = {
-    'getting-started': {
-      angular: 'import { FusionKitModule } from "@inform-appshell/fusion-kit-core";\n\n@NgModule({\n  imports: [FusionKitModule.forRoot()]\n})',
-      react: 'import { FusionKitProvider } from "@inform-appshell/fusion-kit-react";\n\nfunction App() {\n  return <FusionKitProvider><YourApp /></FusionKitProvider>;\n}',
-      vue: 'import { createFusionKit } from "@inform-appshell/fusion-kit-vue";\n\nconst app = createApp(App);\napp.use(createFusionKit());'
-    },
-    'microfrontend-setup': {
-      angular: 'const ModuleFederationPlugin = require("@inform-appshell/fusion-kit-module-federation");\n\nmodule.exports = {\n  plugins: [\n    new ModuleFederationPlugin({\n      name: "mfe1",\n      exposes: { "./Component": "./src/app/app.component" }\n    })\n  ]\n};'
-    },
-    'authentication': {
-      angular: 'import { KeycloakService } from "@inform-appshell/fusion-kit-keycloak";\n\nconstructor(private keycloak: KeycloakService) {}\n\nasync login() {\n  await this.keycloak.login();\n}'
-    },
-    'configuration': {
-      angular: 'import { ConfigService } from "@inform-appshell/fusion-kit-core";\n\nconstructor(private config: ConfigService) {}\n\nget apiUrl() {\n  return this.config.get("api.baseUrl");\n}'
-    }
-  };
-
+  const docs = getIndexedDocs();
+  const exampleSections = docs.examples;
+  
   const useFramework = framework || 'react';
-  const exampleSet = examples[useCase];
-
-  if (!exampleSet) {
-    throw new Error(`No examples found for use case "${useCase}"`);
+  
+  // Find sections that match the use case
+  const relevantSections = exampleSections.filter(section => 
+    section.title.toLowerCase().includes(useCase.toLowerCase()) ||
+    section.content.toLowerCase().includes(useCase.toLowerCase()) ||
+    section.filePath.toLowerCase().includes(useCase.toLowerCase())
+  );
+  
+  if (relevantSections.length === 0) {
+    // Fallback: search in all sections for the use case
+    const allSections = docs.all.filter(section =>
+      section.content.includes('```') && (
+        section.title.toLowerCase().includes(useCase.toLowerCase()) ||
+        section.content.toLowerCase().includes(useCase.toLowerCase())
+      )
+    );
+    
+    if (allSections.length === 0) {
+      throw new Error(`No examples found for use case "${useCase}"`);
+    }
+    
+    relevantSections.push(...allSections);
   }
-
-  const example = exampleSet[useFramework] || exampleSet['react'] || Object.values(exampleSet)[0];
-
+  
+  // Look for framework-specific examples first
+  let selectedSection = relevantSections.find(section => 
+    section.title.toLowerCase().includes(useFramework.toLowerCase()) ||
+    section.content.toLowerCase().includes(useFramework.toLowerCase())
+  );
+  
+  // If no framework-specific example found, use the first relevant section
+  if (!selectedSection) {
+    selectedSection = relevantSections[0];
+  }
+  
+  // Extract code blocks from the content
+  const codeBlocks = extractCodeBlocks(selectedSection.content);
+  const code = codeBlocks.length > 0 ? codeBlocks.join('\n\n') : selectedSection.content;
+  
   return {
     useCase,
     framework: useFramework,
-    code: example
+    code: code || 'No code examples found in documentation'
   };
 };
 
 export const getMigrationGuide = async (fromVersion: string, toVersion?: string): Promise<MigrationGuide> => {
-  const migrationGuides: Record<string, MigrationGuide> = {
-    'v1-to-v2': {
-      title: 'Migration from V1 to V2',
-      overview: 'FusionKit V2 introduces breaking changes to service initialization and configuration management',
-      breakingChanges: [
-        'ConfigService constructor now requires configuration object',
-        'Service registration moved to ServiceRegistry',
-        'Authentication service renamed from AuthService to KeycloakService'
-      ],
-      steps: [
-        'Update package versions to V2',
-        'Migrate service initialization code',
-        'Update configuration imports',
-        'Test all authentication flows'
-      ],
-      codeChanges: 'Before: new ConfigService()\nAfter: new ConfigService(config)'
-    }
+  const docs = getIndexedDocs();
+  const migrationSections = docs.migration;
+  
+  // Find relevant migration guide sections
+  const titleSection = migrationSections.find(s => 
+    s.title.toLowerCase().includes(fromVersion) || 
+    s.title.toLowerCase().includes('migration')
+  );
+  
+  const overviewSection = migrationSections.find(s => 
+    s.title.toLowerCase().includes('overview') ||
+    s.content.length > 50
+  );
+  
+  const breakingChangesSection = migrationSections.find(s => 
+    s.title.toLowerCase().includes('breaking') ||
+    s.title.toLowerCase().includes('changes')
+  );
+  
+  const stepsSection = migrationSections.find(s => 
+    s.title.toLowerCase().includes('steps') ||
+    s.title.toLowerCase().includes('migration guide')
+  );
+  
+  const codeChangesSection = migrationSections.find(s => 
+    s.content.includes('```') ||
+    s.content.includes('Before:') ||
+    s.content.includes('After:')
+  );
+  
+  const guide: MigrationGuide = {
+    title: titleSection?.title || `Migration from ${fromVersion} to ${toVersion || 'latest'}`,
+    overview: overviewSection?.content || 'No migration guide overview found in documentation',
+    breakingChanges: breakingChangesSection ? extractListItems(breakingChangesSection.content) : [],
+    steps: stepsSection ? extractListItems(stepsSection.content) : [],
+    codeChanges: codeChangesSection?.content || 'No code changes documentation found'
   };
-
-  const migrationKey = `${fromVersion}-to-${toVersion || 'latest'}`;
-  const guide = migrationGuides[migrationKey] || migrationGuides['v1-to-v2'];
 
   return guide;
 };

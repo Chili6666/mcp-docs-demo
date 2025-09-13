@@ -1,4 +1,4 @@
-import { createResponse, createError } from '../helper/utils';
+import { createResponse, createError } from '../utils/serverutils.js';
 import { getPackageDocumentation } from './documentationTools';
 
 // Type definition
@@ -25,7 +25,8 @@ export const getPackageDocumentationTool = {
   name: 'getPackageDocumentation',
   description: 'Get documentation for specific packages',
   inputSchema,
-  execute: async ({ packageName, section = 'all' }: GetPackageDocumentationParams) => {
+  execute: async (args: any) => {
+    const { packageName, section = 'all' } = args as GetPackageDocumentationParams;
     try {
       const docs = await getPackageDocumentation(packageName, section);
       return createResponse(JSON.stringify(docs));

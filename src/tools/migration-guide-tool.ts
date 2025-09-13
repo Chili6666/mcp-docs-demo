@@ -1,4 +1,4 @@
-import { createResponse, createError } from '../helper/utils';
+import { createResponse, createError } from '../utils/serverutils.js';
 import { getMigrationGuide } from './documentationTools';
 
 // Type definition
@@ -25,7 +25,8 @@ export const getMigrationGuideTool = {
   name: 'getMigrationGuide',
   description: 'Get migration guide between different versions',
   inputSchema,
-  execute: async ({ fromVersion, toVersion = 'latest' }: GetMigrationGuideParams) => {
+  execute: async (args: any) => {
+    const { fromVersion, toVersion = 'latest' } = args as GetMigrationGuideParams;
     try {
       const guide = await getMigrationGuide(fromVersion, toVersion);
       return createResponse(JSON.stringify(guide));

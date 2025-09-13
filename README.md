@@ -1,44 +1,136 @@
-# MCP Demo Server
+# FusionKit Documentation MCP Server
 
-A sample MCP server implementation.
+A Model Context Protocol (MCP) server that provides dynamic access to FusionKit documentation by indexing markdown files and making them searchable through Claude Code.
 
-## Adding to Claude Code
+## Overview
 
-To register this MCP server with Claude Code:
+This MCP server automatically indexes markdown documentation files and provides structured access to:
+- **Overview Information** - Introduction, benefits, quick start guides
+- **Package Documentation** - Detailed docs for each FusionKit package
+- **Code Examples** - Framework-specific examples extracted from docs
+- **Migration Guides** - Version upgrade instructions and breaking changes
 
-1. **Build the server**:
-   ```bash
-   npm run build
-   ```
+## How It Works
 
-2. **Add the server** using one of these scopes:
+### Architecture Flow
 
-   **For global access (all projects):**
-   ```bash
-   claude mcp add -s user mcp-docs-demo node "D:/dev/myGithub/mcp-docs-demo/dist/server.js"
-   ```
+1. **Lazy Loading**: Documentation is indexed only when first requested
+2. **Markdown Processing**: All `.md` files in the `docs/` folder are recursively scanned
+3. **Section Extraction**: Each markdown heading becomes a searchable section
+4. **Smart Categorization**: Content is automatically categorized by folder structure:
+   - `overview/` → Overview content
+   - `packages/` → Package documentation  
+   - `migration-guide/` → Migration guides
+   - Everything else → Examples/tutorials
+5. **Caching**: Indexed content is cached in memory for fast subsequent access
+6. **Dynamic Responses**: All responses come from actual documentation content (no hardcoded fallbacks)
 
-   **For project-specific access:**
-   ```bash
-   claude mcp add -s project mcp-docs-demo node "D:/dev/myGithub/mcp-docs-demo/dist/server.js"
-   ```
+### Technical Implementation
 
-3. **Verify connection**:
-   ```bash
-   claude mcp list
-   ```
+```typescript
+// Lazy initialization - indexing happens on first call
+const getIndexedDocs = (): IndexedDocs => {
+  if (!indexedDocs) {
+    indexedDocs = docIndexer.indexDocs(); // Scans all markdown files
+  }
+  return indexedDocs; // Cached for subsequent calls
+};
+```
 
-   Or in Claude Code interface: `/mcp list`
+## Setup Instructions
+
+### 1. Build the Server
+```bash
+npm run build
+```
+
+### 2. Add to Claude Code
+
+**For global access (all projects):**
+```bash
+claude mcp add -s user mcp-docs-demo node "D:/dev/myGithub/mcp-docs-demo/dist/server.js"
+```
+
+**For project-specific access:**
+```bash
+claude mcp add -s project mcp-docs-demo node "D:/dev/myGithub/mcp-docs-demo/dist/server.js"
+```
+
+### 3. Verify Connection
+```bash
+claude mcp list
+```
+
+Or in Claude Code interface: `/mcp list`
 
 The server should show as "✓ Connected" when properly configured.
 
+## Available Tools
+
+### 🔍 `getFusionKitOverview`
+**Purpose**: Get high-level overview information about FusionKit
+**Parameters**: 
+- `section` (optional): `'introduction' | 'keyBenefits' | 'quickStart' | 'deploymentScenarios' | 'all'`
+
+### 📦 `getFusionKitPackages` 
+**Purpose**: List all FusionKit packages or get details about a specific package
+**Parameters**:
+- `packageName` (optional): `'core' | 'cli' | 'contracts' | 'keycloak' | 'module-federation'`
+
+### 📚 `getPackageDocumentation`
+**Purpose**: Get detailed documentation for a specific package
+**Parameters**:
+- `packageName`: `'core' | 'cli' | 'contracts' | 'keycloak' | 'module-federation'`
+- `section` (optional): `'overview' | 'installation' | 'api' | 'examples' | 'all'`
+
+### 💻 `getCodeExamples`
+**Purpose**: Get code examples for specific use cases and frameworks
+**Parameters**:
+- `useCase`: `'getting-started' | 'microfrontend-setup' | 'authentication' | 'configuration' | 'service-integration'`
+- `framework` (optional): `'angular' | 'react' | 'vue' | 'vanilla'`
+
+### 🔄 `getMigrationGuide`
+**Purpose**: Get migration instructions between FusionKit versions
+**Parameters**:
+- `fromVersion`: Source version (e.g., "1.0.0", "v1")
+- `toVersion` (optional): Target version (defaults to "latest")
+
 ## Example Queries
 
-Once the MCP server is connected, you can ask Claude Code questions about FusionKit documentation.
+### General Overview
+- "What is FusionKit and what are its key benefits?"
+- "Show me the FusionKit quick start guide"
+- "What deployment scenarios does FusionKit support?"
+- "Give me a complete overview of FusionKit"
+
+### Package Information
+- "Tell me about all FusionKit packages"
+- "What does the fusion-kit-core package do?"
+- "Show me the API documentation for the CLI package"
+- "How do I install the keycloak package?"
+- "Give me examples for the module-federation package"
+
+### Code Examples
+- "Show me getting started examples for React"
+- "Give me Angular authentication code examples"
+- "How do I set up microfrontends with Vue?"
+- "Show me configuration examples for any framework"
+- "Provide service integration examples"
+
+### Migration Help
+- "How do I migrate from v1 to v2?"
+- "Show me the migration guide from version 2.0 to latest"
+- "What breaking changes are there between v1 and v3?"
+- "Help me upgrade from v1.5 to v2.0"
+
+### Specific Searches
+- "Show me all code examples that contain authentication"
+- "Find documentation about encrypted storage"
+- "What packages mention module federation?"
 
 ## Development Workflow
 
-When you make changes to the MCP server code, follow these steps:
+When making changes to the MCP server:
 
 ### 1. Build the Server
 ```bash
@@ -47,99 +139,73 @@ npm run build
 
 ### 2. Restart the MCP Server
 ```bash
-# Remove the current server
+# Remove current server
 claude mcp remove mcp-docs-demo -s user
 
-# Re-add the server  
+# Re-add updated server  
 claude mcp add -s user mcp-docs-demo node "D:/dev/myGithub/mcp-docs-demo/dist/server.js"
 ```
 
 ### 3. Restart VS Code
 - **Close VS Code completely**
 - **Reopen VS Code** to refresh the MCP connection
-- VS Code needs to be restarted to pick up the updated server
+- VS Code restart is required to load the updated server
 
-### 4. Verify Connection
-In Claude Code interface:
-```
+### 4. Test Changes
+```bash
+# Verify connection
 /mcp list
-```
-Should show: `mcp-docs-demo - ✓ Connected`
 
-### 5. Test Your Changes
-Try asking questions like:
-- "What is FusionKit?"
-
-**Note**: Always restart VS Code after rebuilding the MCP server to ensure the Claude Code extension loads the updated version.
-
-
-
-## MCP Tool Registration Patterns
-
-When developing MCP tools with the SDK, use different registration patterns based on parameter count:
-
-### Single Parameter Tools
-For tools with one parameter, use the schema object format:
-```typescript
-server.tool(
-  'toolName',
-  {
-    paramName: {
-      type: 'string',
-      description: 'Parameter description',
-      optional: true, // if optional
-    },
-  },
-  async ({ paramName }: ParamsInterface) => {
-    // implementation
-  }
-);
+# Test functionality
+"What is FusionKit?"
 ```
 
-### Multiple Parameter Tools
-For tools with multiple parameters, use the description string format:
-```typescript
-server.tool(
-  'toolName',
-  'Tool description',
-  async (args: any) => {
-    const { param1, param2 = 'default' } = args as ParamsInterface;
-    // implementation
-  }
-);
+## Adding New Documentation
+
+To add new documentation that will be automatically indexed:
+
+1. **Add markdown files** to the `docs/` directory
+2. **Use standard markdown headings** (`#`, `##`, `###`, etc.)
+3. **Organize by folders**:
+   - `docs/overview/` - General information
+   - `docs/packages/` - Package-specific docs
+   - `docs/migration-guide/` - Version migration info
+   - `docs/examples/` - Tutorials and examples
+4. **No server restart needed** - documentation is re-indexed automatically
+
+## Architecture Benefits
+
+- ✅ **No Hardcoded Content** - All responses come from actual markdown files
+- ✅ **Lazy Loading** - Fast startup, indexing only when needed
+- ✅ **Memory Efficient** - Documentation cached after first load
+- ✅ **Auto-Discovery** - New markdown files automatically included
+- ✅ **Smart Search** - Content searchable by title, content, and file path
+- ✅ **Framework Agnostic** - DocIndexer can be reused for any markdown documentation
+- ✅ **Error Handling** - Graceful degradation when documentation is missing
+
+## Technical Details
+
+### File Structure
+```
+src/
+├── server.ts              # MCP server setup and tool registration
+├── tools/                 # Individual tool implementations
+│   ├── documentationTools.ts   # Core documentation functions
+│   ├── fusionkit-overview-tool.ts
+│   ├── fusionkit-packages-tool.ts
+│   ├── package-documentation-tool.ts
+│   ├── code-examples-tool.ts
+│   └── migration-guide-tool.ts
+└── utils/
+    ├── docIndexer.ts      # Generic markdown indexing (FusionKit-independent)
+    └── serverutils.ts     # MCP response utilities
 ```
 
-## Available Tools
+### Key Components
 
-This MCP server provides the following tools:
+- **`DocIndexer`**: Generic markdown processor (reusable for any documentation)
+- **`documentationTools.ts`**: FusionKit-specific logic using indexed content
+- **Tool files**: Individual MCP tool definitions with parameter schemas
+- **Server registration**: Maps tools to MCP protocol
 
-- **getFusionKitOverview** - Get overview of FusionKit platform
-- **getFusionKitPackages** - Get details about specific FusionKit packages  
-- **getPackageDocumentation** - Get documentation for specific packages
-- **getCodeExamples** - Get code examples for different use cases and frameworks
-- **getMigrationGuide** - Get migration guides between versions
-
-## Example Questions
-
-### FusionKit Overview
-- "What is FusionKit?"
-- "Give me an overview of FusionKit's key benefits"
-- "Show me FusionKit quick start guide"
-- "What are the deployment scenarios for FusionKit?"
-
-### Package Information
-- "Tell me about the FusionKit core package"
-- "What packages are available in FusionKit?"
-- "Show me documentation for the CLI package"
-- "How do I use the module federation package?"
-
-### Code Examples
-- "Show me getting started code examples"
-- "Give me React examples for authentication"
-- "Show me Angular microfrontend setup code"
-- "Provide Vue.js configuration examples"
-
-### Migration Guides
-- "How do I migrate from v1 to v2?"
-- "Show me migration guide from v2.0 to latest"
-- "What's changed between v1 and v3?"
+This architecture makes it easy to adapt the server for different documentation sets by simply changing the folder structure and categorization logic.

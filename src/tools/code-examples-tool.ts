@@ -1,4 +1,4 @@
-import { createResponse, createError } from '../helper/utils';
+import { createResponse, createError } from '../utils/serverutils.js';
 import { getCodeExamples } from './documentationTools';
 
 // Type definition
@@ -25,7 +25,8 @@ export const getCodeExamplesTool = {
   name: 'getCodeExamples',
   description: 'Get code examples for different use cases and frameworks',
   inputSchema,
-  execute: async ({ useCase, framework = 'react' }: GetCodeExamplesParams) => {
+  execute: async (args: any) => {
+    const { useCase, framework = 'react' } = args as GetCodeExamplesParams;
     try {
       const example = await getCodeExamples(useCase, framework);
       return createResponse(JSON.stringify(example));
