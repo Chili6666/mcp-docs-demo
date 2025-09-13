@@ -25,8 +25,7 @@ export const getMigrationGuideTool = {
   name: 'getMigrationGuide',
   description: 'Get migration guide between different versions',
   inputSchema,
-  execute: async (args: any) => {
-    const { fromVersion, toVersion = 'latest' } = args as GetMigrationGuideParams;
+  execute: async ({ fromVersion, toVersion = 'latest' }: GetMigrationGuideParams) => {
     try {
       const guide = await getMigrationGuide(fromVersion, toVersion);
       return createResponse(JSON.stringify(guide));
