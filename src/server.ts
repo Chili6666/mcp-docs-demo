@@ -1,11 +1,11 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 
-import { registerFusionKitOverviewTool } from './tools/fusionkit-overview-tool';
-import { registerFusionKitPackagesTool } from './tools/fusionkit-packages-tool';
-import { registerPackageDocumentationTool } from './tools/package-documentation-tool';
-import { registerCodeExamplesTool } from './tools/code-examples-tool';
-import { registerMigrationGuideTool } from './tools/migration-guide-tool';
+import { getFusionKitOverviewTool } from './tools/fusionkit-overview-tool';
+import { getFusionKitPackagesTool } from './tools/fusionkit-packages-tool';
+import { getPackageDocumentationTool } from './tools/package-documentation-tool';
+import { getCodeExamplesTool } from './tools/code-examples-tool';
+import { getMigrationGuideTool } from './tools/migration-guide-tool';
 
 
 // create the MCP server
@@ -15,11 +15,36 @@ const server = new McpServer({
 });
 
 // register the tools to MCP
-registerFusionKitOverviewTool(server);
-registerFusionKitPackagesTool(server);
-registerPackageDocumentationTool(server);
-registerCodeExamplesTool(server);
-registerMigrationGuideTool(server);
+server.tool(
+  getFusionKitOverviewTool.name,
+  getFusionKitOverviewTool.description,
+  getFusionKitOverviewTool.inputSchema ?? {},
+  getFusionKitOverviewTool.execute
+);
+server.tool(
+  getFusionKitPackagesTool.name,
+  getFusionKitPackagesTool.description,
+  getFusionKitPackagesTool.inputSchema ?? {},
+  getFusionKitPackagesTool.execute
+);
+server.tool(
+  getPackageDocumentationTool.name,
+  getPackageDocumentationTool.description,
+  getPackageDocumentationTool.inputSchema ?? {},
+  getPackageDocumentationTool.execute
+);
+server.tool(
+  getCodeExamplesTool.name,
+  getCodeExamplesTool.description,
+  getCodeExamplesTool.inputSchema ?? {},
+  getCodeExamplesTool.execute
+);
+server.tool(
+  getMigrationGuideTool.name,
+  getMigrationGuideTool.description,
+  getMigrationGuideTool.inputSchema ?? {},
+  getMigrationGuideTool.execute
+);
 
 
 // wrap everything inside an async init to avoid top-level await

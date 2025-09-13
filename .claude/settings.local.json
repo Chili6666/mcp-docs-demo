@@ -14,7 +14,8 @@
       "Bash(mkdir:*)",
       "Bash(find:*)",
       "Bash(npx tsc:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []
