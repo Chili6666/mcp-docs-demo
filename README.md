@@ -107,6 +107,7 @@ The server should show as "✓ Connected" when properly configured.
 - "Tell me about all FusionKit packages"
 - "What does the fusion-kit-core package do?"
 - "Show me the API documentation for the CLI package"
+- "What commands does the FusionKit CLI support?"
 - "How do I install the keycloak package?"
 - "Give me examples for the module-federation package"
 
@@ -116,6 +117,11 @@ The server should show as "✓ Connected" when properly configured.
 - "How do I set up microfrontends with Vue?"
 - "Show me configuration examples for any framework"
 - "Provide service integration examples"
+
+### Framework Usage Guides
+- "How to use FusionKit in React?"
+- "How to use FusionKit in Angular?"
+- "How to use FusionKit in Vue?"
 
 ### Migration Help
 - "How do I migrate from v1 to v2?"

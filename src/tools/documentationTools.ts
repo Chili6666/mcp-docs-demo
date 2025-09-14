@@ -31,7 +31,7 @@ interface CodeExample {
 }
 
 // Initialize the doc indexer
-const docsPath = join(__dirname, '../../docs');
+const docsPath = join(process.cwd(), 'docs');
 const docIndexer = new DocIndexer(docsPath);
 
 // Get fresh docs every time (no caching for development)
@@ -179,6 +179,10 @@ export const getFusionKitPackages = async (packageName?: string): Promise<Record
 };
 
 export const getPackageDocumentation = async (packageName: string, section?: string): Promise<PackageDocumentation | Partial<PackageDocumentation>> => {
+  if (!packageName || typeof packageName !== 'string') {
+    throw new Error(`Package name is required and must be a string, got: ${typeof packageName}`);
+  }
+  
   const docs = getIndexedDocs();
   const packageSections = docs.packages;
   
@@ -213,7 +217,8 @@ export const getPackageDocumentation = async (packageName: string, section?: str
   const apiSection = packageFileSections.find(s => 
     s.title.toLowerCase().includes('api') ||
     s.title.toLowerCase().includes('interface') ||
-    s.title.toLowerCase().includes('features')
+    s.title.toLowerCase().includes('features') ||
+    s.title.toLowerCase().includes('commands')
   );
   
   const exampleSection = packageFileSections.find(s => 
@@ -241,6 +246,10 @@ export const getPackageDocumentation = async (packageName: string, section?: str
 };
 
 export const getCodeExamples = async (useCase: string, framework?: string): Promise<CodeExample> => {
+  if (!useCase || typeof useCase !== 'string') {
+    throw new Error(`Use case is required and must be a string, got: ${typeof useCase}`);
+  }
+  
   const docs = getIndexedDocs();
   
   const useFramework = framework || 'react';
@@ -281,6 +290,10 @@ export const getCodeExamples = async (useCase: string, framework?: string): Prom
 };
 
 export const getMigrationGuide = async (fromVersion: string, toVersion?: string): Promise<MigrationGuide> => {
+  if (!fromVersion || typeof fromVersion !== 'string') {
+    throw new Error(`From version is required and must be a string, got: ${typeof fromVersion}`);
+  }
+  
   const docs = getIndexedDocs();
   const migrationSections = docs.migration;
   

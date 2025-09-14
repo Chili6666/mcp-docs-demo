@@ -20,7 +20,12 @@
       "mcp__mcp-docs-demo__getFusionKitPackages",
       "mcp__mcp-docs-demo__getPackageDocumentation",
       "mcp__mcp-docs-demo__getCodeExamples",
-      "mcp__mcp-docs-demo__getMigrationGuide"
+      "mcp__mcp-docs-demo__getMigrationGuide",
+      "Bash(npm test)",
+      "Bash(npx jest:*)",
+      "Bash(npm run test:ts:*)",
+      "Bash(npm run test:jest:*)",
+      "Bash(npm uninstall:*)"
     ],
     "deny": [],
     "ask": []
