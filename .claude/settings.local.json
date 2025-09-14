@@ -15,7 +15,12 @@
       "Bash(find:*)",
       "Bash(npx tsc:*)",
       "Bash(npm install:*)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "mcp__mcp-docs-demo__getFusionKitOverview",
+      "mcp__mcp-docs-demo__getFusionKitPackages",
+      "mcp__mcp-docs-demo__getPackageDocumentation",
+      "mcp__mcp-docs-demo__getCodeExamples",
+      "mcp__mcp-docs-demo__getMigrationGuide"
     ],
     "deny": [],
     "ask": []

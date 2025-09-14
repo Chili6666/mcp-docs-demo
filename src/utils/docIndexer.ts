@@ -154,10 +154,18 @@ export class DocIndexer {
     const lines = content.split('\n');
     let currentSection: Partial<DocSection> | null = null;
     let contentLines: string[] = [];
+    let inCodeBlock = false;
     
     for (const line of lines) {
-      // Check if line is a markdown heading (# ## ### etc.)
-      const headingMatch = line.trim().match(/^(#{1,6})\s+(.+)$/);
+      // Check if we're entering or leaving a code block
+      if (line.trim().startsWith('```')) {
+        inCodeBlock = !inCodeBlock;
+        contentLines.push(line);
+        continue;
+      }
+      
+      // Only check for headings if we're not in a code block
+      const headingMatch = !inCodeBlock ? line.trim().match(/^(#{1,6})\s+(.+)$/) : null;
       
       if (headingMatch) {
         // Save the previous section if it exists

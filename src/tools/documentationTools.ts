@@ -33,14 +33,10 @@ interface CodeExample {
 // Initialize the doc indexer
 const docsPath = join(__dirname, '../../docs');
 const docIndexer = new DocIndexer(docsPath);
-let indexedDocs: IndexedDocs;
 
-// Initialize docs on first use
+// Get fresh docs every time (no caching for development)
 const getIndexedDocs = (): IndexedDocs => {
-  if (!indexedDocs) {
-    indexedDocs = docIndexer.indexDocs();
-  }
-  return indexedDocs;
+  return docIndexer.indexDocs();
 };
 
 // Helper function to extract list items from markdown content
@@ -101,11 +97,23 @@ export const getFusionKitOverview = async (section?: string): Promise<FusionKitO
   const quickStartSection = overviewSections.find(s => s.title.toLowerCase().includes('quick start'));
   const deploymentSection = overviewSections.find(s => s.title.toLowerCase().includes('deployment scenarios'));
   
+  // Get deployment scenarios from subsections since the main section has no direct content
+  const standaloneSection = overviewSections.find(s => s.title.toLowerCase().includes('standalone applications'));
+  const microfrontendSection = overviewSections.find(s => s.title.toLowerCase().includes('microfrontends in a shell'));
+  
+  const deploymentScenarios: string[] = [];
+  if (standaloneSection) {
+    deploymentScenarios.push(`Standalone Applications: ${standaloneSection.content.split('\n')[0] || 'Run independently'}`);
+  }
+  if (microfrontendSection) {
+    deploymentScenarios.push(`Microfrontends in a Shell: ${microfrontendSection.content.split('\n')[0] || 'Inherit shared services'}`);
+  }
+
   const overview: FusionKitOverview = {
     introduction: introSection?.content || 'No introduction found in documentation',
     keyBenefits: benefitsSection ? extractListItems(benefitsSection.content) : [],
     quickStart: quickStartSection?.content || 'No quick start guide found in documentation',
-    deploymentScenarios: deploymentSection ? extractListItems(deploymentSection.content) : []
+    deploymentScenarios: deploymentScenarios
   };
 
   if (!section || section === 'all') {
@@ -192,10 +200,15 @@ export const getPackageDocumentation = async (packageName: string, section?: str
     s.content.length > 100
   );
   
-  const installationContent = packageFileSections.find(s => 
-    s.content.includes('npm install') || 
-    s.content.includes('install')
-  )?.content.match(/npm install[^\n]*/)?.[0] || 'Installation instructions not found in documentation';
+  // Prioritize sections with actual npm install commands
+  let installationSection = packageFileSections.find(s => s.content.includes('npm install'));
+  if (!installationSection) {
+    // Fallback to sections with "install" in content
+    installationSection = packageFileSections.find(s => s.content.includes('install'));
+  }
+  
+  const installationContent = installationSection?.content.match(/npm install[^\n]*/)?.[0] || 
+    'Installation instructions not found in documentation';
   
   const apiSection = packageFileSections.find(s => 
     s.title.toLowerCase().includes('api') ||
@@ -229,31 +242,20 @@ export const getPackageDocumentation = async (packageName: string, section?: str
 
 export const getCodeExamples = async (useCase: string, framework?: string): Promise<CodeExample> => {
   const docs = getIndexedDocs();
-  const exampleSections = docs.examples;
   
   const useFramework = framework || 'react';
   
-  // Find sections that match the use case
-  const relevantSections = exampleSections.filter(section => 
-    section.title.toLowerCase().includes(useCase.toLowerCase()) ||
-    section.content.toLowerCase().includes(useCase.toLowerCase()) ||
-    section.filePath.toLowerCase().includes(useCase.toLowerCase())
+  // Search all sections for the use case since examples might be embedded anywhere
+  const relevantSections = docs.all.filter(section =>
+    section.content.includes('```') && (
+      section.title.toLowerCase().includes(useCase.toLowerCase()) ||
+      section.content.toLowerCase().includes(useCase.toLowerCase()) ||
+      section.filePath.toLowerCase().includes(useCase.toLowerCase())
+    )
   );
   
   if (relevantSections.length === 0) {
-    // Fallback: search in all sections for the use case
-    const allSections = docs.all.filter(section =>
-      section.content.includes('```') && (
-        section.title.toLowerCase().includes(useCase.toLowerCase()) ||
-        section.content.toLowerCase().includes(useCase.toLowerCase())
-      )
-    );
-    
-    if (allSections.length === 0) {
-      throw new Error(`No examples found for use case "${useCase}"`);
-    }
-    
-    relevantSections.push(...allSections);
+    throw new Error(`No examples found for use case "${useCase}"`);
   }
   
   // Look for framework-specific examples first
