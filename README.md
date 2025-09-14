@@ -111,7 +111,7 @@ The server should show as "✓ Connected" when properly configured.
 - "Give me examples for the module-federation package"
 
 ### Code Examples
-- "Show me getting started examples for React"
+- "Show me React authentication examples"
 - "Give me Angular authentication code examples"
 - "How do I set up microfrontends with Vue?"
 - "Show me configuration examples for any framework"
