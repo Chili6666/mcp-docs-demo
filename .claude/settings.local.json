@@ -25,7 +25,8 @@
       "Bash(npx jest:*)",
       "Bash(npm run test:ts:*)",
       "Bash(npm run test:jest:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(npm test:*)"
     ],
     "deny": [],
     "ask": []

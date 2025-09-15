@@ -1,9 +1,26 @@
+/*
+ * CODE EXAMPLES TOOL
+ *
+ * This tool is triggered when users ask for:
+ * - Code examples or samples
+ * - "How to use [framework]" questions
+ * - Setup guides or getting started examples
+ * - Authentication, configuration, or integration examples
+ * - Framework-specific implementation examples (React, Angular, Vue, etc.)
+ *
+ * Example triggers:
+ * - "Show me React authentication examples"
+ * - "How do I use FusionKit with Angular?"
+ * - "Get code examples for microfrontend setup"
+ * - "I need configuration examples for Vue"
+ */
+
 import { createResponse, createError } from '../utils/serverutils.js';
 import { getCodeExamples } from './documentationTools';
 
 // Type definition
 interface GetCodeExamplesParams {
-  useCase: 'getting-started' | 'microfrontend-setup' | 'authentication' | 'configuration' | 'service-integration';
+  useCase: string;
   framework?: 'angular' | 'react' | 'vue' | 'vanilla';
 }
 
@@ -11,7 +28,7 @@ interface GetCodeExamplesParams {
 const inputSchema = {
   useCase: {
     type: 'string',
-    description: 'The use case for code examples: "getting-started", "microfrontend-setup", "authentication", "configuration", or "service-integration"',
+    description: 'The use case or topic for code examples. Can be one of the predefined cases: "getting-started", "microfrontend-setup", "authentication", "configuration", "service-integration", or describe what you want to see in natural language (e.g., "how to use fusionkit with react", "basic setup", "user login")',
   },
   framework: {
     type: 'string',
@@ -27,6 +44,9 @@ export const getCodeExamplesTool = {
   inputSchema,
   execute: async (args: any) => {
     const { useCase, framework = 'react' } = args as GetCodeExamplesParams;
+    if(!useCase) {
+      return createError('The "useCase" parameter is required.');
+    }
     try {
       const example = await getCodeExamples(useCase, framework);
       return createResponse(JSON.stringify(example));

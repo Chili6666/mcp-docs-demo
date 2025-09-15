@@ -1,3 +1,22 @@
+/*
+ * FUSIONKIT OVERVIEW TOOL
+ *
+ * This tool is triggered when users ask for:
+ * - General information about FusionKit
+ * - "What is FusionKit?" questions
+ * - Overview, introduction, or summary requests
+ * - Key benefits or features of FusionKit
+ * - Quick start guide requests
+ * - Deployment scenarios or architecture info
+ *
+ * Example triggers:
+ * - "What is FusionKit?"
+ * - "Tell me about FusionKit's key benefits"
+ * - "Show me the FusionKit overview"
+ * - "What deployment scenarios does FusionKit support?"
+ * - "Give me a quick start guide for FusionKit"
+ */
+
 import { createResponse, createError } from '../utils/serverutils.js';
 import { getFusionKitOverview } from './documentationTools';
 

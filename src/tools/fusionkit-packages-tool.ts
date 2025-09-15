@@ -1,3 +1,21 @@
+/*
+ * FUSIONKIT PACKAGES TOOL
+ *
+ * This tool is triggered when users ask for:
+ * - List of available FusionKit packages
+ * - Information about specific packages (core, CLI, contracts, etc.)
+ * - Package comparisons or recommendations
+ * - "What packages does FusionKit have?" questions
+ * - Package descriptions or purposes
+ *
+ * Example triggers:
+ * - "What FusionKit packages are available?"
+ * - "Tell me about the fusion-kit-core package"
+ * - "List all FusionKit packages"
+ * - "What does the CLI package do?"
+ * - "Show me information about the keycloak package"
+ */
+
 import { createResponse, createError } from '../utils/serverutils.js';
 import { getFusionKitPackages } from './documentationTools';
 
@@ -22,6 +40,12 @@ export const getFusionKitPackagesTool = {
   inputSchema,
   execute: async (args: any) => {
     const { packageName } = args as GetFusionKitPackagesParams;
+
+    if(!packageName) {
+      return createError('The "packageName" parameter is required.');
+    }
+
+    
     try {
       const packages = await getFusionKitPackages(packageName);
       return createResponse(JSON.stringify(packages));
