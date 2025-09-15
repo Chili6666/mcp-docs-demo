@@ -1,11 +1,10 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-
-import { getFusionKitOverviewTool } from './tools/fusionkit-overview-tool';
-import { getFusionKitPackagesTool } from './tools/fusionkit-packages-tool';
-import { getPackageDocumentationTool } from './tools/package-documentation-tool';
 import { getCodeExamplesTool } from './tools/code-examples-tool';
-import { getMigrationGuideTool } from './tools/migration-guide-tool';
+import { getFusionKitOverviewTool } from './tools/fusionkit-overview-tool';
+import {getFusionKitPackagesTool} from './tools/fusionkit-packages-tool';
+import {getMigrationGuideTool} from './tools/migration-guide-tool';
+import {getPackageDocumentationTool} from './tools/package-documentation-tool';
 
 
 // create the MCP server
@@ -15,37 +14,50 @@ const server = new McpServer({
 });
 
 // register the tools to MCP
-server.tool(
+server.registerTool(
   getFusionKitOverviewTool.name,
-  getFusionKitOverviewTool.description,
-  getFusionKitOverviewTool.inputSchema ?? {},
+  {
+    description: getFusionKitOverviewTool.description,
+    inputSchema: getFusionKitOverviewTool.inputSchema,
+  },
   getFusionKitOverviewTool.execute
 );
-server.tool(
+
+server.registerTool(
   getFusionKitPackagesTool.name,
-  getFusionKitPackagesTool.description,
-  getFusionKitPackagesTool.inputSchema ?? {},
+  {
+    description: getFusionKitPackagesTool.description,
+    inputSchema: getFusionKitPackagesTool.inputSchema,
+  },
   getFusionKitPackagesTool.execute
 );
-server.tool(
-  getPackageDocumentationTool.name,
-  getPackageDocumentationTool.description,
-  getPackageDocumentationTool.inputSchema ?? {},
-  getPackageDocumentationTool.execute
-);
-server.tool(
-  getCodeExamplesTool.name,
-  getCodeExamplesTool.description,
-  getCodeExamplesTool.inputSchema ?? {},
-  getCodeExamplesTool.execute
-);
-server.tool(
+
+server.registerTool(
   getMigrationGuideTool.name,
-  getMigrationGuideTool.description,
-  getMigrationGuideTool.inputSchema ?? {},
+  {
+    description: getMigrationGuideTool.description,
+    inputSchema: getMigrationGuideTool.inputSchema,
+  },
   getMigrationGuideTool.execute
 );
 
+server.registerTool(
+  getPackageDocumentationTool.name,
+  {
+    description: getPackageDocumentationTool.description,
+    inputSchema: getPackageDocumentationTool.inputSchema,
+  },
+  getPackageDocumentationTool.execute
+);
+
+server.registerTool(
+  getCodeExamplesTool.name,
+  {
+    description: getCodeExamplesTool.description,
+    inputSchema: getCodeExamplesTool.inputSchema,
+  },
+  getCodeExamplesTool.execute
+);
 
 // wrap everything inside an async init to avoid top-level await
 const init = async () => {

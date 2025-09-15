@@ -26,7 +26,11 @@
       "Bash(npm run test:ts:*)",
       "Bash(npm run test:jest:*)",
       "Bash(npm uninstall:*)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "mcp__mcp-demo__getMyCalendarDataByDate",
+      "Bash(claude:*)",
+      "Bash(timeout:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []

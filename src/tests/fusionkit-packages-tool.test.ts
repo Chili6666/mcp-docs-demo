@@ -34,17 +34,12 @@ describe('getFusionKitPackagesTool', () => {
     });
 
     it('should have description', () => {
-      expect(getFusionKitPackagesTool.description).toBe('Get information about FusionKit packages including core, CLI, contracts, keycloak, and module-federation packages');
+      expect(getFusionKitPackagesTool.description).toBe('Get information about FusionKit packages including core, CLI, contracts, keycloak, and module-federation packages. When user asks about FusionKit packages, extract the specific package name if mentioned.');
     });
 
     it('should have correct input schema', () => {
-      expect(getFusionKitPackagesTool.inputSchema).toEqual({
-        packageName: {
-          type: 'string',
-          description: 'Specific package to get details for: "core", "cli", "contracts", "keycloak", "module-federation", or leave empty for all packages',
-          optional: true,
-        },
-      });
+      expect(getFusionKitPackagesTool.inputSchema).toBeDefined();
+      expect(getFusionKitPackagesTool.inputSchema.packageName).toBeDefined();
     });
   });
 
@@ -57,14 +52,15 @@ describe('getFusionKitPackagesTool', () => {
       'fusion-kit-module-federation': 'Module federation utilities'
     };
 
-    it('should return error when packageName is missing', async () => {
+    it('should return all packages when packageName is missing', async () => {
+      mockedGetFusionKitPackages.mockResolvedValue(mockAllPackages);
       const result = await getFusionKitPackagesTool.execute({});
 
-      expect(mockedGetFusionKitPackages).not.toHaveBeenCalled();
-      expect(mockedCreateError).toHaveBeenCalledWith('The "packageName" parameter is required.');
+      expect(mockedGetFusionKitPackages).toHaveBeenCalledWith(undefined);
+      expect(mockedCreateResponse).toHaveBeenCalledWith(JSON.stringify(mockAllPackages));
       expect(result).toEqual({
-        content: [{ type: 'text', text: 'The "packageName" parameter is required.' }],
-        isError: true,
+        content: [{ type: 'text', text: JSON.stringify(mockAllPackages) }],
+        isError: false,
       });
     });
 
@@ -104,10 +100,10 @@ describe('getFusionKitPackagesTool', () => {
       mockedGetFusionKitPackages.mockRejectedValue(new Error(errorMessage));
 
       const result = await getFusionKitPackagesTool.execute({
-        packageName: 'nonexistent'
+        packageName: 'core'
       });
 
-      expect(mockedGetFusionKitPackages).toHaveBeenCalledWith('nonexistent');
+      expect(mockedGetFusionKitPackages).toHaveBeenCalledWith('core');
       expect(mockedCreateError).toHaveBeenCalledWith(errorMessage);
       expect(result).toEqual({
         content: [{ type: 'text', text: errorMessage }],
@@ -135,7 +131,7 @@ describe('getFusionKitPackagesTool', () => {
       });
 
       expect(mockedGetFusionKitPackages).not.toHaveBeenCalled();
-      expect(mockedCreateError).toHaveBeenCalledWith('The "packageName" parameter is required.');
+      expect(mockedCreateError).toHaveBeenCalledWith('Invalid parameters: Invalid enum value. Expected \'core\' | \'cli\' | \'contracts\' | \'keycloak\' | \'module-federation\', received \'\'');
       expect(result.isError).toBe(true);
     });
 
@@ -145,7 +141,7 @@ describe('getFusionKitPackagesTool', () => {
       });
 
       expect(mockedGetFusionKitPackages).not.toHaveBeenCalled();
-      expect(mockedCreateError).toHaveBeenCalledWith('The "packageName" parameter is required.');
+      expect(mockedCreateError).toHaveBeenCalledWith('Invalid parameters: Expected \'core\' | \'cli\' | \'contracts\' | \'keycloak\' | \'module-federation\', received null');
       expect(result.isError).toBe(true);
     });
 

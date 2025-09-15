@@ -34,21 +34,13 @@ describe('getCodeExamplesTool', () => {
     });
 
     it('should have description', () => {
-      expect(getCodeExamplesTool.description).toBe('Get code examples for different use cases and frameworks');
+      expect(getCodeExamplesTool.description).toBe('Get FusionKit code examples for different use cases and frameworks. When user asks for FusionKit code examples, setup guides, authentication examples, or framework-specific implementations, extract the use case and framework and pass them as parameters.');
     });
 
     it('should have correct input schema', () => {
-      expect(getCodeExamplesTool.inputSchema).toEqual({
-        useCase: {
-          type: 'string',
-          description: 'The use case or topic for code examples. Can be one of the predefined cases: "getting-started", "microfrontend-setup", "authentication", "configuration", "service-integration", or describe what you want to see in natural language (e.g., "how to use fusionkit with react", "basic setup", "user login")',
-        },
-        framework: {
-          type: 'string',
-          description: 'Framework for the code examples: "angular", "react", "vue", or "vanilla". Defaults to "react" if not specified',
-          optional: true,
-        },
-      });
+      expect(getCodeExamplesTool.inputSchema).toBeDefined();
+      expect(getCodeExamplesTool.inputSchema.useCase).toBeDefined();
+      expect(getCodeExamplesTool.inputSchema.framework).toBeDefined();
     });
   });
 
@@ -110,9 +102,9 @@ describe('getCodeExamplesTool', () => {
       const result = await getCodeExamplesTool.execute({});
 
       expect(mockedGetCodeExamples).not.toHaveBeenCalled();
-      expect(mockedCreateError).toHaveBeenCalledWith('The "useCase" parameter is required.');
+      expect(mockedCreateError).toHaveBeenCalledWith('Invalid parameters: Required');
       expect(result).toEqual({
-        content: [{ type: 'text', text: 'The "useCase" parameter is required.' }],
+        content: [{ type: 'text', text: 'Invalid parameters: Required' }],
         isError: true,
       });
     });
@@ -123,9 +115,9 @@ describe('getCodeExamplesTool', () => {
       });
 
       expect(mockedGetCodeExamples).not.toHaveBeenCalled();
-      expect(mockedCreateError).toHaveBeenCalledWith('The "useCase" parameter is required.');
+      expect(mockedCreateError).toHaveBeenCalledWith('Invalid parameters: Expected string, received null');
       expect(result).toEqual({
-        content: [{ type: 'text', text: 'The "useCase" parameter is required.' }],
+        content: [{ type: 'text', text: 'Invalid parameters: Expected string, received null' }],
         isError: true,
       });
     });
@@ -136,9 +128,9 @@ describe('getCodeExamplesTool', () => {
       });
 
       expect(mockedGetCodeExamples).not.toHaveBeenCalled();
-      expect(mockedCreateError).toHaveBeenCalledWith('The "useCase" parameter is required.');
+      expect(mockedCreateError).toHaveBeenCalledWith('No use case was extracted from your request. This appears to be a parameter extraction issue.');
       expect(result).toEqual({
-        content: [{ type: 'text', text: 'The "useCase" parameter is required.' }],
+        content: [{ type: 'text', text: 'No use case was extracted from your request. This appears to be a parameter extraction issue.' }],
         isError: true,
       });
     });

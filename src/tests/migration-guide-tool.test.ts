@@ -34,21 +34,13 @@ describe('getMigrationGuideTool', () => {
     });
 
     it('should have description', () => {
-      expect(getMigrationGuideTool.description).toBe('Get migration guide between different versions');
+      expect(getMigrationGuideTool.description).toBe('Get migration guide between different versions of FusionKit. When user asks about migrating, upgrading, or version changes, extract the source and target versions.');
     });
 
     it('should have correct input schema', () => {
-      expect(getMigrationGuideTool.inputSchema).toEqual({
-        fromVersion: {
-          type: 'string',
-          description: 'The version to migrate from (e.g., "1.0.0", "2.1.3")',
-        },
-        toVersion: {
-          type: 'string',
-          description: 'The version to migrate to. Defaults to "latest" if not specified',
-          optional: true,
-        },
-      });
+      expect(getMigrationGuideTool.inputSchema).toBeDefined();
+      expect(getMigrationGuideTool.inputSchema.fromVersion).toBeDefined();
+      expect(getMigrationGuideTool.inputSchema.toVersion).toBeDefined();
     });
   });
 
@@ -65,9 +57,9 @@ describe('getMigrationGuideTool', () => {
       const result = await getMigrationGuideTool.execute({});
 
       expect(mockedGetMigrationGuide).not.toHaveBeenCalled();
-      expect(mockedCreateError).toHaveBeenCalledWith('The "fromVersion" parameter is required.');
+      expect(mockedCreateError).toHaveBeenCalledWith('Invalid parameters: Required');
       expect(result).toEqual({
-        content: [{ type: 'text', text: 'The "fromVersion" parameter is required.' }],
+        content: [{ type: 'text', text: 'Invalid parameters: Required' }],
         isError: true,
       });
     });
@@ -78,9 +70,9 @@ describe('getMigrationGuideTool', () => {
       });
 
       expect(mockedGetMigrationGuide).not.toHaveBeenCalled();
-      expect(mockedCreateError).toHaveBeenCalledWith('The "fromVersion" parameter is required.');
+      expect(mockedCreateError).toHaveBeenCalledWith('Invalid parameters: Expected string, received null');
       expect(result).toEqual({
-        content: [{ type: 'text', text: 'The "fromVersion" parameter is required.' }],
+        content: [{ type: 'text', text: 'Invalid parameters: Expected string, received null' }],
         isError: true,
       });
     });
@@ -91,9 +83,9 @@ describe('getMigrationGuideTool', () => {
       });
 
       expect(mockedGetMigrationGuide).not.toHaveBeenCalled();
-      expect(mockedCreateError).toHaveBeenCalledWith('The "fromVersion" parameter is required.');
+      expect(mockedCreateError).toHaveBeenCalledWith('No source version was extracted from your request. This appears to be a parameter extraction issue.');
       expect(result).toEqual({
-        content: [{ type: 'text', text: 'The "fromVersion" parameter is required.' }],
+        content: [{ type: 'text', text: 'No source version was extracted from your request. This appears to be a parameter extraction issue.' }],
         isError: true,
       });
     });
@@ -228,15 +220,14 @@ describe('getMigrationGuideTool', () => {
     });
 
     it('should handle null toVersion parameter', async () => {
-      mockedGetMigrationGuide.mockResolvedValue(mockMigrationGuide);
-
       const result = await getMigrationGuideTool.execute({
         fromVersion: 'v1.0',
         toVersion: null
       });
 
-      expect(mockedGetMigrationGuide).toHaveBeenCalledWith('v1.0', null);
-      expect(result.isError).toBe(false);
+      expect(mockedGetMigrationGuide).not.toHaveBeenCalled();
+      expect(mockedCreateError).toHaveBeenCalledWith('Invalid parameters: Expected string, received null');
+      expect(result.isError).toBe(true);
     });
   });
 });

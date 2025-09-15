@@ -1,5 +1,7 @@
 // FusionKit Documentation Tools
 import { join } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import { DocIndexer, IndexedDocs } from '../utils/docIndexer.js';
 
 interface FusionKitOverview {
@@ -30,8 +32,9 @@ interface CodeExample {
   code: string;
 }
 
-// Initialize the doc indexer
-const docsPath = join(process.cwd(), 'docs');
+// Initialize the doc indexer with absolute path
+// The MCP server might run from a different working directory, so we use absolute path
+const docsPath = 'D:/dev/myGithub/mcp-docs-demo/docs';
 const docIndexer = new DocIndexer(docsPath);
 
 // Get fresh docs every time (no caching for development)
@@ -182,17 +185,17 @@ export const getPackageDocumentation = async (packageName: string, section?: str
   if (!packageName || typeof packageName !== 'string') {
     throw new Error(`Package name is required and must be a string, got: ${typeof packageName}`);
   }
-  
+
   const docs = getIndexedDocs();
   const packageSections = docs.packages;
-  
+
   // Find the package file sections
   const packageFileName = `fusion-kit-${packageName}`;
-  const packageFileSections = packageSections.filter(s => 
+  const packageFileSections = packageSections.filter(s =>
     s.filePath.toLowerCase().includes(packageFileName.toLowerCase()) ||
     s.filePath.toLowerCase().includes(packageName.toLowerCase())
   );
-  
+
   if (packageFileSections.length === 0) {
     throw new Error(`Documentation for package "${packageName}" not found`);
   }

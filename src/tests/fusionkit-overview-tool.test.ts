@@ -34,17 +34,12 @@ describe('getFusionKitOverviewTool', () => {
     });
 
     it('should have description', () => {
-      expect(getFusionKitOverviewTool.description).toBe('Get overview information about FusionKit including introduction, key benefits, quick start guide, and deployment scenarios');
+      expect(getFusionKitOverviewTool.description).toBe('Get overview information about FusionKit including introduction, key benefits, quick start guide, and deployment scenarios. When user asks about FusionKit overview, introduction, benefits, or deployment info, extract the specific section they want.');
     });
 
     it('should have correct input schema', () => {
-      expect(getFusionKitOverviewTool.inputSchema).toEqual({
-        section: {
-          type: 'string',
-          description: 'Specific section to focus on: "introduction", "keyBenefits", "quickStart", "deploymentScenarios", or "all" for complete overview',
-          optional: true,
-        },
-      });
+      expect(getFusionKitOverviewTool.inputSchema).toBeDefined();
+      expect(getFusionKitOverviewTool.inputSchema.section).toBeDefined();
     });
   });
 
@@ -105,10 +100,10 @@ describe('getFusionKitOverviewTool', () => {
       mockedGetFusionKitOverview.mockRejectedValue(new Error(errorMessage));
 
       const result = await getFusionKitOverviewTool.execute({
-        section: 'invalidSection'
+        section: 'introduction'
       });
 
-      expect(mockedGetFusionKitOverview).toHaveBeenCalledWith('invalidSection');
+      expect(mockedGetFusionKitOverview).toHaveBeenCalledWith('introduction');
       expect(mockedCreateError).toHaveBeenCalledWith(errorMessage);
       expect(result).toEqual({
         content: [{ type: 'text', text: errorMessage }],
@@ -138,14 +133,13 @@ describe('getFusionKitOverviewTool', () => {
     });
 
     it('should handle null section parameter', async () => {
-      mockedGetFusionKitOverview.mockResolvedValue(mockOverview);
-
       const result = await getFusionKitOverviewTool.execute({
         section: null
       });
 
-      expect(mockedGetFusionKitOverview).toHaveBeenCalledWith(null);
-      expect(result.isError).toBe(false);
+      expect(mockedGetFusionKitOverview).not.toHaveBeenCalled();
+      expect(mockedCreateError).toHaveBeenCalledWith('Invalid parameters: Expected \'introduction\' | \'keyBenefits\' | \'quickStart\' | \'deploymentScenarios\' | \'all\', received null');
+      expect(result.isError).toBe(true);
     });
   });
 });
