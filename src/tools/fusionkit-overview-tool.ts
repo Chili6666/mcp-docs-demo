@@ -25,7 +25,11 @@ import { z } from 'zod';
 
 // Define Zod schema for FusionKit Overview parameters
 const FusionKitOverviewParamsSchema = z.object({
-  section: z.enum(['introduction', 'keyBenefits', 'quickStart', 'deploymentScenarios', 'all']).optional().default('all').describe('Specific section to focus on: "introduction", "keyBenefits", "quickStart", "deploymentScenarios", or "all" for complete overview')
+  section: z
+    .enum(['introduction', 'keyBenefits', 'quickStart', 'deploymentScenarios', 'all'])
+    .optional()
+    .default('all')
+    .describe('Specific section to focus on: "introduction", "keyBenefits", "quickStart", "deploymentScenarios", or "all" for complete overview'),
 });
 
 type FusionKitOverviewParams = z.infer<typeof FusionKitOverviewParamsSchema>;
@@ -33,7 +37,8 @@ type FusionKitOverviewParams = z.infer<typeof FusionKitOverviewParamsSchema>;
 // Tool definition for external registration
 export const getFusionKitOverviewTool = {
   name: 'getFusionKitOverview',
-  description: 'Get overview information about FusionKit including introduction, key benefits, quick start guide, and deployment scenarios. When user asks about FusionKit overview, introduction, benefits, or deployment info, extract the specific section they want.',
+  description:
+    'Get overview information about FusionKit including introduction, key benefits, quick start guide, and deployment scenarios. When user asks about FusionKit overview, introduction, benefits, or deployment info, extract the specific section they want.',
   inputSchema: FusionKitOverviewParamsSchema.shape,
   execute: async (args: any) => {
     try {
@@ -54,5 +59,5 @@ export const getFusionKitOverviewTool = {
       const errorMessage = error instanceof Error ? error.message : 'Error retrieving FusionKit overview';
       return createError(errorMessage);
     }
-  }
+  },
 };

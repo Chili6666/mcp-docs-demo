@@ -8,43 +8,43 @@ const mockIndexedDocs: IndexedDocs = {
       title: 'What is FusionKit?',
       content: 'FusionKit is a comprehensive framework for building modular applications.',
       filePath: 'overview.md',
-      level: 1
+      level: 1,
     },
     {
       id: 'overview_key_benefits',
       title: 'Key Benefits',
       content: '- Modular architecture\n- Easy integration\n- Scalable solutions',
       filePath: 'overview.md',
-      level: 2
+      level: 2,
     },
     {
       id: 'overview_quick_start',
       title: 'Quick Start Guide',
       content: 'Follow these steps to get started with FusionKit quickly.',
       filePath: 'overview.md',
-      level: 2
+      level: 2,
     },
     {
       id: 'overview_deployment_scenarios',
       title: 'Deployment Scenarios',
       content: '',
       filePath: 'overview.md',
-      level: 2
+      level: 2,
     },
     {
       id: 'overview_standalone_applications',
       title: 'Standalone Applications',
       content: 'Run independently with full control.',
       filePath: 'overview.md',
-      level: 3
+      level: 3,
     },
     {
       id: 'overview_microfrontends_shell',
       title: 'Microfrontends in a Shell',
       content: 'Inherit shared services from parent shell.',
       filePath: 'overview.md',
-      level: 3
-    }
+      level: 3,
+    },
   ],
   packages: [
     {
@@ -52,15 +52,15 @@ const mockIndexedDocs: IndexedDocs = {
       title: 'Fusion Kit Core',
       content: 'Core functionality for FusionKit applications.',
       filePath: 'packages/fusion-kit-core.md',
-      level: 1
+      level: 1,
     },
     {
       id: 'packages_fusion_kit_cli',
       title: 'Fusion Kit CLI',
       content: 'Command-line interface for FusionKit development.',
       filePath: 'packages/fusion-kit-cli.md',
-      level: 1
-    }
+      level: 1,
+    },
   ],
   migration: [
     {
@@ -68,29 +68,29 @@ const mockIndexedDocs: IndexedDocs = {
       title: 'Migration from v1.0 to v2.0',
       content: 'This guide covers migrating from version 1.0 to 2.0.',
       filePath: 'migration/v1-to-v2.md',
-      level: 1
+      level: 1,
     },
     {
       id: 'migration_breaking_changes',
       title: 'Breaking Changes',
       content: '- API endpoint changes\n- Configuration format updates',
       filePath: 'migration/v1-to-v2.md',
-      level: 2
+      level: 2,
     },
     {
       id: 'migration_steps',
       title: 'Migration Steps',
       content: '- Update dependencies\n- Run migration script\n- Test application',
       filePath: 'migration/v1-to-v2.md',
-      level: 2
+      level: 2,
     },
     {
       id: 'migration_code_changes',
       title: 'Code Changes',
       content: '```javascript\n// Before:\noldApi.method();\n\n// After:\nnewApi.method();\n```',
       filePath: 'migration/v1-to-v2.md',
-      level: 2
-    }
+      level: 2,
+    },
   ],
   examples: [
     {
@@ -98,35 +98,24 @@ const mockIndexedDocs: IndexedDocs = {
       title: 'React Setup Example',
       content: '```jsx\nimport React from "react";\nimport { FusionKit } from "fusion-kit-core";\n\nfunction App() {\n  return <div>Hello FusionKit</div>;\n}\n```',
       filePath: 'examples/react-setup.md',
-      level: 1
-    }
+      level: 1,
+    },
   ],
-  all: []
+  all: [],
 };
 
 // Set up the 'all' array with all sections
-mockIndexedDocs.all = [
-  ...mockIndexedDocs.overview,
-  ...mockIndexedDocs.packages,
-  ...mockIndexedDocs.migration,
-  ...mockIndexedDocs.examples
-];
+mockIndexedDocs.all = [...mockIndexedDocs.overview, ...mockIndexedDocs.packages, ...mockIndexedDocs.migration, ...mockIndexedDocs.examples];
 
 // Mock the DocIndexer class
 jest.mock('../utils/docIndexer', () => ({
   DocIndexer: jest.fn().mockImplementation(() => ({
-    indexDocs: () => mockIndexedDocs
-  }))
+    indexDocs: () => mockIndexedDocs,
+  })),
 }));
 
 // Import the functions after mocking
-import {
-  getFusionKitOverview,
-  getFusionKitPackages,
-  getPackageDocumentation,
-  getCodeExamples,
-  getMigrationGuide
-} from '../tools/documentationTools';
+import { getFusionKitOverview, getFusionKitPackages, getPackageDocumentation, getCodeExamples, getMigrationGuide } from '../tools/documentationTools';
 
 describe('documentationTools', () => {
   describe('getFusionKitOverview', () => {
@@ -137,10 +126,7 @@ describe('documentationTools', () => {
         introduction: 'FusionKit is a comprehensive framework for building modular applications.',
         keyBenefits: ['Modular architecture', 'Easy integration', 'Scalable solutions'],
         quickStart: 'Follow these steps to get started with FusionKit quickly.',
-        deploymentScenarios: [
-          'Standalone Applications: Run independently with full control.',
-          'Microfrontends in a Shell: Inherit shared services from parent shell.'
-        ]
+        deploymentScenarios: ['Standalone Applications: Run independently with full control.', 'Microfrontends in a Shell: Inherit shared services from parent shell.'],
       });
     });
 
@@ -148,7 +134,7 @@ describe('documentationTools', () => {
       const result = await getFusionKitOverview('keyBenefits');
 
       expect(result).toEqual({
-        keyBenefits: ['Modular architecture', 'Easy integration', 'Scalable solutions']
+        keyBenefits: ['Modular architecture', 'Easy integration', 'Scalable solutions'],
       });
     });
 
@@ -163,7 +149,7 @@ describe('documentationTools', () => {
 
       expect(result).toEqual({
         'fusion-kit-core': 'Core functionality for FusionKit applications.',
-        'fusion-kit-cli': 'Command-line interface for FusionKit development.'
+        'fusion-kit-cli': 'Command-line interface for FusionKit development.',
       });
     });
 
@@ -171,7 +157,7 @@ describe('documentationTools', () => {
       const result = await getFusionKitPackages('core');
 
       expect(result).toEqual({
-        'core': 'Core functionality for FusionKit applications.'
+        core: 'Core functionality for FusionKit applications.',
       });
     });
 
@@ -188,7 +174,7 @@ describe('documentationTools', () => {
         overview: 'Core functionality for FusionKit applications.',
         installation: 'Installation instructions not found in documentation',
         api: 'API documentation not found',
-        examples: 'Examples not found in documentation'
+        examples: 'Examples not found in documentation',
       });
     });
 
@@ -196,7 +182,7 @@ describe('documentationTools', () => {
       const result = await getPackageDocumentation('core', 'overview');
 
       expect(result).toEqual({
-        overview: 'Core functionality for FusionKit applications.'
+        overview: 'Core functionality for FusionKit applications.',
       });
     });
 
@@ -220,7 +206,7 @@ describe('documentationTools', () => {
       expect(result).toEqual({
         useCase: 'react',
         framework: 'react',
-        code: 'import React from "react";\nimport { FusionKit } from "fusion-kit-core";\n\nfunction App() {\n  return <div>Hello FusionKit</div>;\n}'
+        code: 'import React from "react";\nimport { FusionKit } from "fusion-kit-core";\n\nfunction App() {\n  return <div>Hello FusionKit</div>;\n}',
       });
     });
 
@@ -230,7 +216,7 @@ describe('documentationTools', () => {
       expect(result).toEqual({
         useCase: 'setup',
         framework: 'react',
-        code: 'import React from "react";\nimport { FusionKit } from "fusion-kit-core";\n\nfunction App() {\n  return <div>Hello FusionKit</div>;\n}'
+        code: 'import React from "react";\nimport { FusionKit } from "fusion-kit-core";\n\nfunction App() {\n  return <div>Hello FusionKit</div>;\n}',
       });
     });
 
@@ -252,7 +238,7 @@ describe('documentationTools', () => {
         overview: 'This guide covers migrating from version 1.0 to 2.0.',
         breakingChanges: ['API endpoint changes', 'Configuration format updates'],
         steps: ['Update dependencies', 'Run migration script', 'Test application'],
-        codeChanges: '```javascript\n// Before:\noldApi.method();\n\n// After:\nnewApi.method();\n```'
+        codeChanges: '```javascript\n// Before:\noldApi.method();\n\n// After:\nnewApi.method();\n```',
       });
     });
 

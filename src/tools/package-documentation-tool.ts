@@ -19,22 +19,27 @@
  * - "How to use FusionKit packages in my project?"
  */
 
-import { createResponse, createError } from "../utils/serverutils.js";
-import { getPackageDocumentation } from "./documentationTools";
+import { createResponse, createError } from '../utils/serverutils.js';
+import { getPackageDocumentation } from './documentationTools';
 import { z } from 'zod';
 
 // Define Zod schema for Package Documentation parameters
 const PackageDocumentationParamsSchema = z.object({
   packageName: z.enum(['core', 'cli', 'contracts', 'keycloak', 'module-federation']).describe('Package name: "core", "cli", "contracts", "keycloak", or "module-federation"'),
-  section: z.enum(['overview', 'installation', 'api', 'examples', 'all']).optional().default('all').describe('Documentation section: "overview", "installation", "api", "examples", or "all" for complete documentation. Defaults to "all" if not specified')
+  section: z
+    .enum(['overview', 'installation', 'api', 'examples', 'all'])
+    .optional()
+    .default('all')
+    .describe('Documentation section: "overview", "installation", "api", "examples", or "all" for complete documentation. Defaults to "all" if not specified'),
 });
 
 type PackageDocumentationParams = z.infer<typeof PackageDocumentationParamsSchema>;
 
 // Tool definition for external registration
 export const getPackageDocumentationTool = {
-  name: "getPackageDocumentation",
-  description: "Get documentation for specific FusionKit packages including installation, API reference, and usage examples. When user asks for package documentation, extract the package name and specific section if mentioned.",
+  name: 'getPackageDocumentation',
+  description:
+    'Get documentation for specific FusionKit packages including installation, API reference, and usage examples. When user asks for package documentation, extract the package name and specific section if mentioned.',
   inputSchema: PackageDocumentationParamsSchema.shape,
   execute: async (args: any) => {
     try {
@@ -49,7 +54,7 @@ export const getPackageDocumentationTool = {
 
       // If no packageName provided, this indicates Claude didn't extract the parameter
       if (!packageName) {
-        return createError("No package name was extracted from your request. This appears to be a parameter extraction issue.");
+        return createError('No package name was extracted from your request. This appears to be a parameter extraction issue.');
       }
 
       // Call the actual implementation
@@ -57,7 +62,7 @@ export const getPackageDocumentationTool = {
 
       return createResponse(JSON.stringify(docs));
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Error retrieving package documentation";
+      const errorMessage = error instanceof Error ? error.message : 'Error retrieving package documentation';
       return createError(errorMessage);
     }
   },

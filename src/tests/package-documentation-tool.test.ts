@@ -34,7 +34,9 @@ describe('getPackageDocumentationTool', () => {
     });
 
     it('should have description', () => {
-      expect(getPackageDocumentationTool.description).toBe('Get documentation for specific FusionKit packages including installation, API reference, and usage examples. When user asks for package documentation, extract the package name and specific section if mentioned.');
+      expect(getPackageDocumentationTool.description).toBe(
+        'Get documentation for specific FusionKit packages including installation, API reference, and usage examples. When user asks for package documentation, extract the package name and specific section if mentioned.',
+      );
     });
 
     it('should have correct input schema', () => {
@@ -49,7 +51,7 @@ describe('getPackageDocumentationTool', () => {
       overview: 'Core functionality for FusionKit applications',
       installation: 'npm install fusion-kit-core',
       api: 'API documentation for the core package',
-      examples: 'Usage examples for the core package'
+      examples: 'Usage examples for the core package',
     };
 
     it('should return error when packageName is missing', async () => {
@@ -65,26 +67,28 @@ describe('getPackageDocumentationTool', () => {
 
     it('should return error when packageName is null', async () => {
       const result = await getPackageDocumentationTool.execute({
-        packageName: null
+        packageName: null,
       });
 
       expect(mockedGetPackageDocumentation).not.toHaveBeenCalled();
-      expect(mockedCreateError).toHaveBeenCalledWith('Invalid parameters: Expected \'core\' | \'cli\' | \'contracts\' | \'keycloak\' | \'module-federation\', received null');
+      expect(mockedCreateError).toHaveBeenCalledWith("Invalid parameters: Expected 'core' | 'cli' | 'contracts' | 'keycloak' | 'module-federation', received null");
       expect(result).toEqual({
-        content: [{ type: 'text', text: 'Invalid parameters: Expected \'core\' | \'cli\' | \'contracts\' | \'keycloak\' | \'module-federation\', received null' }],
+        content: [{ type: 'text', text: "Invalid parameters: Expected 'core' | 'cli' | 'contracts' | 'keycloak' | 'module-federation', received null" }],
         isError: true,
       });
     });
 
     it('should return error when packageName is empty string', async () => {
       const result = await getPackageDocumentationTool.execute({
-        packageName: ''
+        packageName: '',
       });
 
       expect(mockedGetPackageDocumentation).not.toHaveBeenCalled();
-      expect(mockedCreateError).toHaveBeenCalledWith('Invalid parameters: Invalid enum value. Expected \'core\' | \'cli\' | \'contracts\' | \'keycloak\' | \'module-federation\', received \'\'');
+      expect(mockedCreateError).toHaveBeenCalledWith(
+        "Invalid parameters: Invalid enum value. Expected 'core' | 'cli' | 'contracts' | 'keycloak' | 'module-federation', received ''",
+      );
       expect(result).toEqual({
-        content: [{ type: 'text', text: 'Invalid parameters: Invalid enum value. Expected \'core\' | \'cli\' | \'contracts\' | \'keycloak\' | \'module-federation\', received \'\'' }],
+        content: [{ type: 'text', text: "Invalid parameters: Invalid enum value. Expected 'core' | 'cli' | 'contracts' | 'keycloak' | 'module-federation', received ''" }],
         isError: true,
       });
     });
@@ -93,7 +97,7 @@ describe('getPackageDocumentationTool', () => {
       mockedGetPackageDocumentation.mockResolvedValue(mockPackageDoc);
 
       const result = await getPackageDocumentationTool.execute({
-        packageName: 'core'
+        packageName: 'core',
       });
 
       expect(mockedGetPackageDocumentation).toHaveBeenCalledWith('core', 'all');
@@ -110,7 +114,7 @@ describe('getPackageDocumentationTool', () => {
 
       const result = await getPackageDocumentationTool.execute({
         packageName: 'core',
-        section: 'installation'
+        section: 'installation',
       });
 
       expect(mockedGetPackageDocumentation).toHaveBeenCalledWith('core', 'installation');
@@ -145,7 +149,7 @@ describe('getPackageDocumentationTool', () => {
 
         await getPackageDocumentationTool.execute({
           packageName: 'core',
-          section
+          section,
         });
 
         expect(mockedGetPackageDocumentation).toHaveBeenCalledWith('core', section);
@@ -159,7 +163,7 @@ describe('getPackageDocumentationTool', () => {
       mockedGetPackageDocumentation.mockRejectedValue(new Error(errorMessage));
 
       const result = await getPackageDocumentationTool.execute({
-        packageName: 'core'
+        packageName: 'core',
       });
 
       expect(mockedGetPackageDocumentation).toHaveBeenCalledWith('core', 'all');
@@ -176,7 +180,7 @@ describe('getPackageDocumentationTool', () => {
 
       const result = await getPackageDocumentationTool.execute({
         packageName: 'core',
-        section: 'api'
+        section: 'api',
       });
 
       expect(mockedGetPackageDocumentation).toHaveBeenCalledWith('core', 'api');
@@ -191,7 +195,7 @@ describe('getPackageDocumentationTool', () => {
       mockedGetPackageDocumentation.mockRejectedValue('Some string error');
 
       const result = await getPackageDocumentationTool.execute({
-        packageName: 'core'
+        packageName: 'core',
       });
 
       expect(mockedCreateError).toHaveBeenCalledWith('Error retrieving package documentation');
@@ -206,7 +210,7 @@ describe('getPackageDocumentationTool', () => {
       mockedGetPackageDocumentation.mockRejectedValue(new Error(errorMessage));
 
       const result = await getPackageDocumentationTool.execute({
-        packageName: 'core'
+        packageName: 'core',
       });
 
       expect(mockedCreateError).toHaveBeenCalledWith(errorMessage);

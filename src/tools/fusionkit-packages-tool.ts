@@ -24,7 +24,10 @@ import { z } from 'zod';
 
 // Define Zod schema for FusionKit Packages parameters
 const FusionKitPackagesParamsSchema = z.object({
-  packageName: z.enum(['core', 'cli', 'contracts', 'keycloak', 'module-federation']).optional().describe('Specific package to get details for: "core", "cli", "contracts", "keycloak", "module-federation", or leave empty for all packages')
+  packageName: z
+    .enum(['core', 'cli', 'contracts', 'keycloak', 'module-federation'])
+    .optional()
+    .describe('Specific package to get details for: "core", "cli", "contracts", "keycloak", "module-federation", or leave empty for all packages'),
 });
 
 type FusionKitPackagesParams = z.infer<typeof FusionKitPackagesParamsSchema>;
@@ -32,7 +35,8 @@ type FusionKitPackagesParams = z.infer<typeof FusionKitPackagesParamsSchema>;
 // Tool definition for external registration
 export const getFusionKitPackagesTool = {
   name: 'getFusionKitPackages',
-  description: 'Get information about FusionKit packages including core, CLI, contracts, keycloak, and module-federation packages. When user asks about FusionKit packages, extract the specific package name if mentioned.',
+  description:
+    'Get information about FusionKit packages including core, CLI, contracts, keycloak, and module-federation packages. When user asks about FusionKit packages, extract the specific package name if mentioned.',
   inputSchema: FusionKitPackagesParamsSchema.shape,
   execute: async (args: any) => {
     try {
@@ -53,5 +57,5 @@ export const getFusionKitPackagesTool = {
       const errorMessage = error instanceof Error ? error.message : 'Error retrieving package information';
       return createError(errorMessage);
     }
-  }
+  },
 };

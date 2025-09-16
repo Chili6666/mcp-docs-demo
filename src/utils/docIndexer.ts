@@ -55,7 +55,7 @@ export class DocIndexer {
       packages: [],
       migration: [],
       examples: [],
-      all: []
+      all: [],
     };
   }
 
@@ -76,10 +76,8 @@ export class DocIndexer {
    */
   public findContent(query: string): DocSection[] {
     const queryLower = query.toLowerCase();
-    return this.indexed.all.filter(section => 
-      section.title.toLowerCase().includes(queryLower) ||
-      section.content.toLowerCase().includes(queryLower) ||
-      section.filePath.toLowerCase().includes(queryLower)
+    return this.indexed.all.filter(
+      section => section.title.toLowerCase().includes(queryLower) || section.content.toLowerCase().includes(queryLower) || section.filePath.toLowerCase().includes(queryLower),
     );
   }
 
@@ -100,12 +98,12 @@ export class DocIndexer {
   private processDirectory(dirPath: string): void {
     try {
       const items = readdirSync(dirPath);
-      
+
       // Process each item in the directory
       for (const item of items) {
         const fullPath = join(dirPath, item);
         const stat = statSync(fullPath);
-        
+
         if (stat.isDirectory()) {
           // Recursively process subdirectories
           this.processDirectory(fullPath);
@@ -128,16 +126,15 @@ export class DocIndexer {
       const content = readFileSync(filePath, 'utf-8');
       const relativePath = relative(this.docsPath, filePath);
       const sections = this.extractSections(content, relativePath);
-      
+
       // Categorize sections based on file path
       const category = this.categorizeByPath(relativePath);
-      
+
       // Add sections to both the 'all' collection and the appropriate category
       sections.forEach(section => {
         this.indexed.all.push(section);
         this.indexed[category].push(section);
       });
-      
     } catch (error) {
       console.warn(`Could not process file ${filePath}:`, error);
     }
@@ -155,7 +152,7 @@ export class DocIndexer {
     let currentSection: Partial<DocSection> | null = null;
     let contentLines: string[] = [];
     let inCodeBlock = false;
-    
+
     for (const line of lines) {
       // Check if we're entering or leaving a code block
       if (line.trim().startsWith('```')) {
@@ -163,29 +160,29 @@ export class DocIndexer {
         contentLines.push(line);
         continue;
       }
-      
+
       // Only check for headings if we're not in a code block
       const headingMatch = !inCodeBlock ? line.trim().match(/^(#{1,6})\s+(.+)$/) : null;
-      
+
       if (headingMatch) {
         // Save the previous section if it exists
         if (currentSection && currentSection.title) {
           sections.push({
             ...currentSection,
-            content: contentLines.join('\n').trim()
+            content: contentLines.join('\n').trim(),
           } as DocSection);
         }
-        
+
         // Start a new section
         const level = headingMatch[1].length; // Count the # characters
         const title = headingMatch[2].trim(); // Extract heading text
         const id = this.generateId(title, filePath);
-        
+
         currentSection = {
           id,
           title,
           filePath,
-          level
+          level,
         };
         contentLines = [];
       } else {
@@ -193,15 +190,15 @@ export class DocIndexer {
         contentLines.push(line);
       }
     }
-    
+
     // Don't forget to save the last section
     if (currentSection && currentSection.title) {
       sections.push({
         ...currentSection,
-        content: contentLines.join('\n').trim()
+        content: contentLines.join('\n').trim(),
       } as DocSection);
     }
-    
+
     return sections;
   }
 
@@ -212,7 +209,7 @@ export class DocIndexer {
    */
   private categorizeByPath(filePath: string): keyof Omit<IndexedDocs, 'all'> {
     const normalizedPath = filePath.toLowerCase().replace(/\\/g, '/');
-    
+
     // Categorize based on directory structure and file names
     if (normalizedPath.includes('overview') || normalizedPath === 'index.md') {
       return 'overview';
@@ -235,12 +232,13 @@ export class DocIndexer {
   private generateId(title: string, filePath: string): string {
     // Create a file prefix by replacing path separators and removing extension
     const filePrefix = filePath.replace(/[/\\]/g, '_').replace(/\.md$/, '');
-    
+
     // Create a URL-friendly slug from the title
-    const titleSlug = title.toLowerCase()
+    const titleSlug = title
+      .toLowerCase()
       .replace(/[^\w\s-]/g, '') // Remove special characters
       .replace(/\s+/g, '-'); // Replace spaces with hyphens
-    
+
     return `${filePrefix}_${titleSlug}`;
   }
 }

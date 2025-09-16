@@ -2,15 +2,15 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { getCodeExamplesTool } from './tools/code-examples-tool';
 import { getFusionKitOverviewTool } from './tools/fusionkit-overview-tool';
-import {getFusionKitPackagesTool} from './tools/fusionkit-packages-tool';
-import {getMigrationGuideTool} from './tools/migration-guide-tool';
-import {getPackageDocumentationTool} from './tools/package-documentation-tool';
-import {createCopilotTool} from './tools/copilot-cli-tool';
-
+import { getFusionKitPackagesTool } from './tools/fusionkit-packages-tool';
+import { getMigrationGuideTool } from './tools/migration-guide-tool';
+import { getPackageDocumentationTool } from './tools/package-documentation-tool';
+import { createCopilotTool } from './tools/copilot-cli-tool';
+import { registerMainDocsResource } from './resources/maindocs-resource';
 
 // create the MCP server
 const server = new McpServer({
-  name: "Documentation Scraper",
+  name: 'Documentation Scraper',
   version: '1.0.0',
 });
 
@@ -21,7 +21,7 @@ server.registerTool(
     description: getFusionKitOverviewTool.description,
     inputSchema: getFusionKitOverviewTool.inputSchema,
   },
-  getFusionKitOverviewTool.execute
+  getFusionKitOverviewTool.execute,
 );
 
 server.registerTool(
@@ -30,7 +30,7 @@ server.registerTool(
     description: getFusionKitPackagesTool.description,
     inputSchema: getFusionKitPackagesTool.inputSchema,
   },
-  getFusionKitPackagesTool.execute
+  getFusionKitPackagesTool.execute,
 );
 
 server.registerTool(
@@ -39,7 +39,7 @@ server.registerTool(
     description: getMigrationGuideTool.description,
     inputSchema: getMigrationGuideTool.inputSchema,
   },
-  getMigrationGuideTool.execute
+  getMigrationGuideTool.execute,
 );
 
 server.registerTool(
@@ -48,7 +48,7 @@ server.registerTool(
     description: getPackageDocumentationTool.description,
     inputSchema: getPackageDocumentationTool.inputSchema,
   },
-  getPackageDocumentationTool.execute
+  getPackageDocumentationTool.execute,
 );
 
 server.registerTool(
@@ -57,7 +57,7 @@ server.registerTool(
     description: getCodeExamplesTool.description,
     inputSchema: getCodeExamplesTool.inputSchema,
   },
-  getCodeExamplesTool.execute
+  getCodeExamplesTool.execute,
 );
 
 server.registerTool(
@@ -66,12 +66,16 @@ server.registerTool(
     description: createCopilotTool.description,
     inputSchema: createCopilotTool.inputSchema,
   },
-  createCopilotTool.execute
+  createCopilotTool.execute,
 );
 
 // wrap everything inside an async init to avoid top-level await
 const init = async () => {
   // set transport
+
+  // register the main docs resource
+  await registerMainDocsResource(server);
+
   const transport = new StdioServerTransport();
   await server.connect(transport);
 };

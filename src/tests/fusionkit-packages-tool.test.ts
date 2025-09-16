@@ -34,7 +34,9 @@ describe('getFusionKitPackagesTool', () => {
     });
 
     it('should have description', () => {
-      expect(getFusionKitPackagesTool.description).toBe('Get information about FusionKit packages including core, CLI, contracts, keycloak, and module-federation packages. When user asks about FusionKit packages, extract the specific package name if mentioned.');
+      expect(getFusionKitPackagesTool.description).toBe(
+        'Get information about FusionKit packages including core, CLI, contracts, keycloak, and module-federation packages. When user asks about FusionKit packages, extract the specific package name if mentioned.',
+      );
     });
 
     it('should have correct input schema', () => {
@@ -49,7 +51,7 @@ describe('getFusionKitPackagesTool', () => {
       'fusion-kit-cli': 'Command-line interface for FusionKit development',
       'fusion-kit-contracts': 'Type contracts and interfaces',
       'fusion-kit-keycloak': 'Keycloak integration package',
-      'fusion-kit-module-federation': 'Module federation utilities'
+      'fusion-kit-module-federation': 'Module federation utilities',
     };
 
     it('should return all packages when packageName is missing', async () => {
@@ -65,11 +67,11 @@ describe('getFusionKitPackagesTool', () => {
     });
 
     it('should execute successfully with specific package name', async () => {
-      const mockSinglePackage = { 'core': 'Core functionality for FusionKit applications' };
+      const mockSinglePackage = { core: 'Core functionality for FusionKit applications' };
       mockedGetFusionKitPackages.mockResolvedValue(mockSinglePackage);
 
       const result = await getFusionKitPackagesTool.execute({
-        packageName: 'core'
+        packageName: 'core',
       });
 
       expect(mockedGetFusionKitPackages).toHaveBeenCalledWith('core');
@@ -100,7 +102,7 @@ describe('getFusionKitPackagesTool', () => {
       mockedGetFusionKitPackages.mockRejectedValue(new Error(errorMessage));
 
       const result = await getFusionKitPackagesTool.execute({
-        packageName: 'core'
+        packageName: 'core',
       });
 
       expect(mockedGetFusionKitPackages).toHaveBeenCalledWith('core');
@@ -115,7 +117,7 @@ describe('getFusionKitPackagesTool', () => {
       mockedGetFusionKitPackages.mockRejectedValue('Some string error');
 
       const result = await getFusionKitPackagesTool.execute({
-        packageName: 'core'
+        packageName: 'core',
       });
 
       expect(mockedCreateError).toHaveBeenCalledWith('Error retrieving package information');
@@ -127,21 +129,23 @@ describe('getFusionKitPackagesTool', () => {
 
     it('should return error for empty package name', async () => {
       const result = await getFusionKitPackagesTool.execute({
-        packageName: ''
+        packageName: '',
       });
 
       expect(mockedGetFusionKitPackages).not.toHaveBeenCalled();
-      expect(mockedCreateError).toHaveBeenCalledWith('Invalid parameters: Invalid enum value. Expected \'core\' | \'cli\' | \'contracts\' | \'keycloak\' | \'module-federation\', received \'\'');
+      expect(mockedCreateError).toHaveBeenCalledWith(
+        "Invalid parameters: Invalid enum value. Expected 'core' | 'cli' | 'contracts' | 'keycloak' | 'module-federation', received ''",
+      );
       expect(result.isError).toBe(true);
     });
 
     it('should return error for null package name', async () => {
       const result = await getFusionKitPackagesTool.execute({
-        packageName: null
+        packageName: null,
       });
 
       expect(mockedGetFusionKitPackages).not.toHaveBeenCalled();
-      expect(mockedCreateError).toHaveBeenCalledWith('Invalid parameters: Expected \'core\' | \'cli\' | \'contracts\' | \'keycloak\' | \'module-federation\', received null');
+      expect(mockedCreateError).toHaveBeenCalledWith("Invalid parameters: Expected 'core' | 'cli' | 'contracts' | 'keycloak' | 'module-federation', received null");
       expect(result.isError).toBe(true);
     });
 
@@ -150,7 +154,7 @@ describe('getFusionKitPackagesTool', () => {
       mockedGetFusionKitPackages.mockRejectedValue(new Error(errorMessage));
 
       const result = await getFusionKitPackagesTool.execute({
-        packageName: 'core'
+        packageName: 'core',
       });
 
       expect(mockedCreateError).toHaveBeenCalledWith(errorMessage);

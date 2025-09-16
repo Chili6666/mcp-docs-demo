@@ -22,10 +22,11 @@ import { promisify } from 'util';
 
 // Define Zod schema for Copilot CLI parameters
 const CopilotCliParamsSchema = z.object({
-  name: z.string()
+  name: z
+    .string()
     .min(1, 'Project name cannot be empty')
     .regex(/^[a-zA-Z0-9_-]+$/, 'Project name can only contain letters, numbers, hyphens, and underscores')
-    .describe('Name of the copilot project to create')
+    .describe('Name of the copilot project to create'),
 });
 
 // Execute CLI command helper
@@ -35,15 +36,15 @@ const execCommand = (command: string, args: string[]): Promise<{ stdout: string;
     let stdout = '';
     let stderr = '';
 
-    child.stdout?.on('data', (data) => {
+    child.stdout?.on('data', data => {
       stdout += data.toString();
     });
 
-    child.stderr?.on('data', (data) => {
+    child.stderr?.on('data', data => {
       stderr += data.toString();
     });
 
-    child.on('close', (code) => {
+    child.on('close', code => {
       if (code === 0) {
         resolve({ stdout, stderr });
       } else {
@@ -51,7 +52,7 @@ const execCommand = (command: string, args: string[]): Promise<{ stdout: string;
       }
     });
 
-    child.on('error', (error) => {
+    child.on('error', error => {
       reject(error);
     });
   });
@@ -60,7 +61,8 @@ const execCommand = (command: string, args: string[]): Promise<{ stdout: string;
 // Tool definition for external registration
 export const createCopilotTool = {
   name: 'createCopilot',
-  description: 'Create a new FusionKit copilot project using the FusionKit CLI command "fk create copilot -n <name>". This will generate a complete MCP server project structure with all necessary files and configurations.',
+  description:
+    'Create a new FusionKit copilot project using the FusionKit CLI command "fk create copilot -n <name>". This will generate a complete MCP server project structure with all necessary files and configurations.',
   inputSchema: CopilotCliParamsSchema.shape,
   execute: async (args: any) => {
     try {
@@ -85,10 +87,9 @@ export const createCopilotTool = {
       const successMessage = `Successfully created FusionKit copilot project "${name}"!\n\n${stdout}\n\nNext steps:\n1. Navigate to the project directory: cd ${name}\n2. Install dependencies: npm install\n3. Build the project: npm run build\n4. Start the MCP server: npm start`;
 
       return createResponse(successMessage);
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error creating copilot project';
-      
+
       // Check if it's a "command not found" error
       if (errorMessage.includes('ENOENT') || errorMessage.includes('command not found')) {
         return createError('FusionKit CLI (fk) not found. Please install it first with: npm install -g @inform-appshell/fusion-kit-cli@latest');
@@ -96,5 +97,5 @@ export const createCopilotTool = {
 
       return createError(`Failed to create copilot project: ${errorMessage}`);
     }
-  }
+  },
 };

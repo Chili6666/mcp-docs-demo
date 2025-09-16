@@ -34,7 +34,9 @@ describe('getFusionKitOverviewTool', () => {
     });
 
     it('should have description', () => {
-      expect(getFusionKitOverviewTool.description).toBe('Get overview information about FusionKit including introduction, key benefits, quick start guide, and deployment scenarios. When user asks about FusionKit overview, introduction, benefits, or deployment info, extract the specific section they want.');
+      expect(getFusionKitOverviewTool.description).toBe(
+        'Get overview information about FusionKit including introduction, key benefits, quick start guide, and deployment scenarios. When user asks about FusionKit overview, introduction, benefits, or deployment info, extract the specific section they want.',
+      );
     });
 
     it('should have correct input schema', () => {
@@ -48,7 +50,7 @@ describe('getFusionKitOverviewTool', () => {
       introduction: 'FusionKit is a comprehensive framework',
       keyBenefits: ['Modular', 'Scalable'],
       quickStart: 'Quick start guide',
-      deploymentScenarios: ['Standalone', 'Microfrontends']
+      deploymentScenarios: ['Standalone', 'Microfrontends'],
     };
 
     it('should execute successfully with no parameters (default behavior)', async () => {
@@ -69,7 +71,7 @@ describe('getFusionKitOverviewTool', () => {
       mockedGetFusionKitOverview.mockResolvedValue(mockSectionResult);
 
       const result = await getFusionKitOverviewTool.execute({
-        section: 'keyBenefits'
+        section: 'keyBenefits',
       });
 
       expect(mockedGetFusionKitOverview).toHaveBeenCalledWith('keyBenefits');
@@ -100,7 +102,7 @@ describe('getFusionKitOverviewTool', () => {
       mockedGetFusionKitOverview.mockRejectedValue(new Error(errorMessage));
 
       const result = await getFusionKitOverviewTool.execute({
-        section: 'introduction'
+        section: 'introduction',
       });
 
       expect(mockedGetFusionKitOverview).toHaveBeenCalledWith('introduction');
@@ -134,11 +136,11 @@ describe('getFusionKitOverviewTool', () => {
 
     it('should handle null section parameter', async () => {
       const result = await getFusionKitOverviewTool.execute({
-        section: null
+        section: null,
       });
 
       expect(mockedGetFusionKitOverview).not.toHaveBeenCalled();
-      expect(mockedCreateError).toHaveBeenCalledWith('Invalid parameters: Expected \'introduction\' | \'keyBenefits\' | \'quickStart\' | \'deploymentScenarios\' | \'all\', received null');
+      expect(mockedCreateError).toHaveBeenCalledWith("Invalid parameters: Expected 'introduction' | 'keyBenefits' | 'quickStart' | 'deploymentScenarios' | 'all', received null");
       expect(result.isError).toBe(true);
     });
   });

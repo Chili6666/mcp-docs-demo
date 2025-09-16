@@ -30,7 +30,8 @@
       "mcp__mcp-demo__getMyCalendarDataByDate",
       "Bash(claude:*)",
       "Bash(timeout:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "mcp__mcp-docs-demo__createCopilot"
     ],
     "deny": [],
     "ask": []

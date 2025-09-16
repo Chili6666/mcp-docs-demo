@@ -34,7 +34,9 @@ describe('getMigrationGuideTool', () => {
     });
 
     it('should have description', () => {
-      expect(getMigrationGuideTool.description).toBe('Get migration guide between different versions of FusionKit. When user asks about migrating, upgrading, or version changes, extract the source and target versions.');
+      expect(getMigrationGuideTool.description).toBe(
+        'Get migration guide between different versions of FusionKit. When user asks about migrating, upgrading, or version changes, extract the source and target versions.',
+      );
     });
 
     it('should have correct input schema', () => {
@@ -50,7 +52,7 @@ describe('getMigrationGuideTool', () => {
       overview: 'This guide covers migrating from version 1.0 to 2.0',
       breakingChanges: ['API endpoint changes', 'Configuration format updates'],
       steps: ['Update dependencies', 'Run migration script', 'Test application'],
-      codeChanges: 'Before: oldApi.method(); After: newApi.method();'
+      codeChanges: 'Before: oldApi.method(); After: newApi.method();',
     };
 
     it('should return error when fromVersion is missing', async () => {
@@ -66,7 +68,7 @@ describe('getMigrationGuideTool', () => {
 
     it('should return error when fromVersion is null', async () => {
       const result = await getMigrationGuideTool.execute({
-        fromVersion: null
+        fromVersion: null,
       });
 
       expect(mockedGetMigrationGuide).not.toHaveBeenCalled();
@@ -79,7 +81,7 @@ describe('getMigrationGuideTool', () => {
 
     it('should return error when fromVersion is empty string', async () => {
       const result = await getMigrationGuideTool.execute({
-        fromVersion: ''
+        fromVersion: '',
       });
 
       expect(mockedGetMigrationGuide).not.toHaveBeenCalled();
@@ -94,7 +96,7 @@ describe('getMigrationGuideTool', () => {
       mockedGetMigrationGuide.mockResolvedValue(mockMigrationGuide);
 
       const result = await getMigrationGuideTool.execute({
-        fromVersion: 'v1.0'
+        fromVersion: 'v1.0',
       });
 
       expect(mockedGetMigrationGuide).toHaveBeenCalledWith('v1.0', 'latest');
@@ -108,13 +110,13 @@ describe('getMigrationGuideTool', () => {
     it('should execute successfully with fromVersion and toVersion parameters', async () => {
       const customMigrationGuide = {
         ...mockMigrationGuide,
-        title: 'Migration from v1.0 to v3.0'
+        title: 'Migration from v1.0 to v3.0',
       };
       mockedGetMigrationGuide.mockResolvedValue(customMigrationGuide);
 
       const result = await getMigrationGuideTool.execute({
         fromVersion: 'v1.0',
-        toVersion: 'v3.0'
+        toVersion: 'v3.0',
       });
 
       expect(mockedGetMigrationGuide).toHaveBeenCalledWith('v1.0', 'v3.0');
@@ -131,19 +133,19 @@ describe('getMigrationGuideTool', () => {
         { from: 'v1', to: 'v2' },
         { from: '1.5', to: 'latest' },
         { from: '2.0', to: '3.0' },
-        { from: 'v1.2.3', to: 'v2.0.0' }
+        { from: 'v1.2.3', to: 'v2.0.0' },
       ];
 
       for (const { from, to } of versionFormats) {
         const mockResult = {
           ...mockMigrationGuide,
-          title: `Migration from ${from} to ${to}`
+          title: `Migration from ${from} to ${to}`,
         };
         mockedGetMigrationGuide.mockResolvedValue(mockResult);
 
         await getMigrationGuideTool.execute({
           fromVersion: from,
-          toVersion: to
+          toVersion: to,
         });
 
         expect(mockedGetMigrationGuide).toHaveBeenCalledWith(from, to);
@@ -156,7 +158,7 @@ describe('getMigrationGuideTool', () => {
       mockedGetMigrationGuide.mockResolvedValue(mockMigrationGuide);
 
       await getMigrationGuideTool.execute({
-        fromVersion: 'v1.0'
+        fromVersion: 'v1.0',
       });
 
       expect(mockedGetMigrationGuide).toHaveBeenCalledWith('v1.0', 'latest');
@@ -167,7 +169,7 @@ describe('getMigrationGuideTool', () => {
       mockedGetMigrationGuide.mockRejectedValue(new Error(errorMessage));
 
       const result = await getMigrationGuideTool.execute({
-        fromVersion: 'v99'
+        fromVersion: 'v99',
       });
 
       expect(mockedGetMigrationGuide).toHaveBeenCalledWith('v99', 'latest');
@@ -182,7 +184,7 @@ describe('getMigrationGuideTool', () => {
       mockedGetMigrationGuide.mockRejectedValue('Some string error');
 
       const result = await getMigrationGuideTool.execute({
-        fromVersion: 'v1.0'
+        fromVersion: 'v1.0',
       });
 
       expect(mockedCreateError).toHaveBeenCalledWith('Error retrieving migration guide');
@@ -197,7 +199,7 @@ describe('getMigrationGuideTool', () => {
       mockedGetMigrationGuide.mockRejectedValue(new Error(errorMessage));
 
       const result = await getMigrationGuideTool.execute({
-        fromVersion: 'v1.0'
+        fromVersion: 'v1.0',
       });
 
       expect(mockedCreateError).toHaveBeenCalledWith(errorMessage);
@@ -212,7 +214,7 @@ describe('getMigrationGuideTool', () => {
 
       const result = await getMigrationGuideTool.execute({
         fromVersion: 'v1.0',
-        toVersion: ''
+        toVersion: '',
       });
 
       expect(mockedGetMigrationGuide).toHaveBeenCalledWith('v1.0', '');
@@ -222,7 +224,7 @@ describe('getMigrationGuideTool', () => {
     it('should handle null toVersion parameter', async () => {
       const result = await getMigrationGuideTool.execute({
         fromVersion: 'v1.0',
-        toVersion: null
+        toVersion: null,
       });
 
       expect(mockedGetMigrationGuide).not.toHaveBeenCalled();

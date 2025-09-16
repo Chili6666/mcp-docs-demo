@@ -18,22 +18,23 @@
  * - "How to update my FusionKit project to the latest version?"
  */
 
-import { createResponse, createError } from "../utils/serverutils.js";
-import { getMigrationGuide } from "./documentationTools";
+import { createResponse, createError } from '../utils/serverutils.js';
+import { getMigrationGuide } from './documentationTools';
 import { z } from 'zod';
 
 // Define Zod schema for Migration Guide parameters
 const MigrationGuideParamsSchema = z.object({
   fromVersion: z.string().describe('The version to migrate from (e.g., "1.0.0", "2.1.3", "v1", "v2")'),
-  toVersion: z.string().optional().default("latest").describe('The version to migrate to. Defaults to "latest" if not specified')
+  toVersion: z.string().optional().default('latest').describe('The version to migrate to. Defaults to "latest" if not specified'),
 });
 
 type MigrationGuideParams = z.infer<typeof MigrationGuideParamsSchema>;
 
 // Tool definition for external registration
 export const getMigrationGuideTool = {
-  name: "getMigrationGuide",
-  description: "Get migration guide between different versions of FusionKit. When user asks about migrating, upgrading, or version changes, extract the source and target versions.",
+  name: 'getMigrationGuide',
+  description:
+    'Get migration guide between different versions of FusionKit. When user asks about migrating, upgrading, or version changes, extract the source and target versions.',
   inputSchema: MigrationGuideParamsSchema.shape,
   execute: async (args: any) => {
     try {
@@ -48,7 +49,7 @@ export const getMigrationGuideTool = {
 
       // If no fromVersion provided, this indicates Claude didn't extract the parameter
       if (!fromVersion) {
-        return createError("No source version was extracted from your request. This appears to be a parameter extraction issue.");
+        return createError('No source version was extracted from your request. This appears to be a parameter extraction issue.');
       }
 
       // Call the actual implementation
@@ -56,7 +57,7 @@ export const getMigrationGuideTool = {
 
       return createResponse(JSON.stringify(guide));
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Error retrieving migration guide";
+      const errorMessage = error instanceof Error ? error.message : 'Error retrieving migration guide';
       return createError(errorMessage);
     }
   },

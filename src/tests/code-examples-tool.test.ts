@@ -34,7 +34,9 @@ describe('getCodeExamplesTool', () => {
     });
 
     it('should have description', () => {
-      expect(getCodeExamplesTool.description).toBe('Get FusionKit code examples for different use cases and frameworks. When user asks for FusionKit code examples, setup guides, authentication examples, or framework-specific implementations, extract the use case and framework and pass them as parameters.');
+      expect(getCodeExamplesTool.description).toBe(
+        'Get FusionKit code examples for different use cases and frameworks. When user asks for FusionKit code examples, setup guides, authentication examples, or framework-specific implementations, extract the use case and framework and pass them as parameters.',
+      );
     });
 
     it('should have correct input schema', () => {
@@ -48,14 +50,14 @@ describe('getCodeExamplesTool', () => {
     const mockCodeExample = {
       useCase: 'getting-started',
       framework: 'react',
-      code: 'console.log("Hello World");'
+      code: 'console.log("Hello World");',
     };
 
     it('should execute successfully with required parameters', async () => {
       mockedGetCodeExamples.mockResolvedValue(mockCodeExample);
 
       const result = await getCodeExamplesTool.execute({
-        useCase: 'getting-started'
+        useCase: 'getting-started',
       });
 
       expect(mockedGetCodeExamples).toHaveBeenCalledWith('getting-started', 'react');
@@ -70,14 +72,14 @@ describe('getCodeExamplesTool', () => {
       const mockAngularExample = {
         useCase: 'microfrontend-setup',
         framework: 'angular',
-        code: 'import { NgModule } from "@angular/core";'
+        code: 'import { NgModule } from "@angular/core";',
       };
 
       mockedGetCodeExamples.mockResolvedValue(mockAngularExample);
 
       const result = await getCodeExamplesTool.execute({
         useCase: 'microfrontend-setup',
-        framework: 'angular'
+        framework: 'angular',
       });
 
       expect(mockedGetCodeExamples).toHaveBeenCalledWith('microfrontend-setup', 'angular');
@@ -92,7 +94,7 @@ describe('getCodeExamplesTool', () => {
       mockedGetCodeExamples.mockResolvedValue(mockCodeExample);
 
       await getCodeExamplesTool.execute({
-        useCase: 'authentication'
+        useCase: 'authentication',
       });
 
       expect(mockedGetCodeExamples).toHaveBeenCalledWith('authentication', 'react');
@@ -111,7 +113,7 @@ describe('getCodeExamplesTool', () => {
 
     it('should return error when useCase is null', async () => {
       const result = await getCodeExamplesTool.execute({
-        useCase: null
+        useCase: null,
       });
 
       expect(mockedGetCodeExamples).not.toHaveBeenCalled();
@@ -124,7 +126,7 @@ describe('getCodeExamplesTool', () => {
 
     it('should return error when useCase is empty string', async () => {
       const result = await getCodeExamplesTool.execute({
-        useCase: ''
+        useCase: '',
       });
 
       expect(mockedGetCodeExamples).not.toHaveBeenCalled();
@@ -140,7 +142,7 @@ describe('getCodeExamplesTool', () => {
       mockedGetCodeExamples.mockRejectedValue(new Error(errorMessage));
 
       const result = await getCodeExamplesTool.execute({
-        useCase: 'invalid-case'
+        useCase: 'invalid-case',
       });
 
       expect(mockedGetCodeExamples).toHaveBeenCalledWith('invalid-case', 'react');
@@ -155,7 +157,7 @@ describe('getCodeExamplesTool', () => {
       mockedGetCodeExamples.mockRejectedValue('Some string error');
 
       const result = await getCodeExamplesTool.execute({
-        useCase: 'getting-started'
+        useCase: 'getting-started',
       });
 
       expect(mockedCreateError).toHaveBeenCalledWith('Error retrieving code examples');
@@ -166,19 +168,13 @@ describe('getCodeExamplesTool', () => {
     });
 
     it('should work with all supported use cases', async () => {
-      const useCases = [
-        'getting-started',
-        'microfrontend-setup',
-        'authentication',
-        'configuration',
-        'service-integration'
-      ];
+      const useCases = ['getting-started', 'microfrontend-setup', 'authentication', 'configuration', 'service-integration'];
 
       for (const useCase of useCases) {
         mockedGetCodeExamples.mockResolvedValue({
           useCase,
           framework: 'react',
-          code: `// Code for ${useCase}`
+          code: `// Code for ${useCase}`,
         });
 
         await getCodeExamplesTool.execute({ useCase });
@@ -196,12 +192,12 @@ describe('getCodeExamplesTool', () => {
         mockedGetCodeExamples.mockResolvedValue({
           useCase: 'getting-started',
           framework,
-          code: `// Code for ${framework}`
+          code: `// Code for ${framework}`,
         });
 
         await getCodeExamplesTool.execute({
           useCase: 'getting-started',
-          framework
+          framework,
         });
 
         expect(mockedGetCodeExamples).toHaveBeenCalledWith('getting-started', framework);
@@ -215,13 +211,13 @@ describe('getCodeExamplesTool', () => {
       const mockResponse = {
         useCase: naturalLanguageQuery,
         framework: 'react',
-        code: 'import React from "react";\nimport { FusionKit } from "fusion-kit-core";'
+        code: 'import React from "react";\nimport { FusionKit } from "fusion-kit-core";',
       };
 
       mockedGetCodeExamples.mockResolvedValue(mockResponse);
 
       const result = await getCodeExamplesTool.execute({
-        useCase: naturalLanguageQuery
+        useCase: naturalLanguageQuery,
       });
 
       expect(mockedGetCodeExamples).toHaveBeenCalledWith(naturalLanguageQuery, 'react');
@@ -237,14 +233,14 @@ describe('getCodeExamplesTool', () => {
       const mockResponse = {
         useCase: naturalLanguageQuery,
         framework: 'angular',
-        code: 'import { NgModule } from "@angular/core";\nimport { FusionKitModule } from "fusion-kit-angular";'
+        code: 'import { NgModule } from "@angular/core";\nimport { FusionKitModule } from "fusion-kit-angular";',
       };
 
       mockedGetCodeExamples.mockResolvedValue(mockResponse);
 
       const result = await getCodeExamplesTool.execute({
         useCase: naturalLanguageQuery,
-        framework: 'angular'
+        framework: 'angular',
       });
 
       expect(mockedGetCodeExamples).toHaveBeenCalledWith(naturalLanguageQuery, 'angular');
@@ -260,13 +256,13 @@ describe('getCodeExamplesTool', () => {
       const mockResponse = {
         useCase: complexQuery,
         framework: 'react',
-        code: '// React FusionKit integration example\nimport { FusionKit } from "fusion-kit-core";\n\nfunction App() {\n  return <div>FusionKit App</div>;\n}'
+        code: '// React FusionKit integration example\nimport { FusionKit } from "fusion-kit-core";\n\nfunction App() {\n  return <div>FusionKit App</div>;\n}',
       };
 
       mockedGetCodeExamples.mockResolvedValue(mockResponse);
 
       const result = await getCodeExamplesTool.execute({
-        useCase: complexQuery
+        useCase: complexQuery,
       });
 
       expect(mockedGetCodeExamples).toHaveBeenCalledWith(complexQuery, 'react');
