@@ -6,6 +6,7 @@ import { getFusionKitPackagesTool } from './tools/fusionkit-packages-tool';
 import { getMigrationGuideTool } from './tools/migration-guide-tool';
 import { getPackageDocumentationTool } from './tools/package-documentation-tool';
 import { createCopilotTool } from './tools/copilot-cli-tool';
+import { createShellTool } from './tools/shell-cli-tool';
 import { registerMainDocsResource } from './resources/maindocs-resource';
 
 // create the MCP server
@@ -67,6 +68,15 @@ server.registerTool(
     inputSchema: createCopilotTool.inputSchema,
   },
   createCopilotTool.execute,
+);
+
+server.registerTool(
+  createShellTool.name,
+  {
+    description: createShellTool.description,
+    inputSchema: createShellTool.inputSchema,
+  },
+  createShellTool.execute,
 );
 
 // wrap everything inside an async init to avoid top-level await

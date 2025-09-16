@@ -11,7 +11,7 @@
   },
   "scripts": {
     "build": "tsc && npm run copy-docs",
-    "copy-docs": "cp -r docs dist/",
+    "copy-docs": "xcopy docs dist\\docs /E /I /Y || robocopy docs dist\\docs /E /XO",
     "test": "jest",
     "test:watch": "jest --watch"
   },
