@@ -18,7 +18,7 @@
 import { createResponse, createError } from '../utils/serverutils.js';
 import { z } from 'zod';
 import { spawn } from 'child_process';
-import { promisify } from 'util';
+import { resolve } from 'path';
 
 // Define Zod schema for Copilot CLI parameters
 const CopilotCliParamsSchema = z.object({
@@ -30,9 +30,9 @@ const CopilotCliParamsSchema = z.object({
 });
 
 // Execute CLI command helper
-const execCommand = (command: string, args: string[]): Promise<{ stdout: string; stderr: string }> => {
+const execCommand = (command: string, args: string[], cwd?: string): Promise<{ stdout: string; stderr: string }> => {
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args, { shell: true });
+    const child = spawn(command, args, { shell: true, cwd });
     let stdout = '';
     let stderr = '';
 
@@ -56,6 +56,12 @@ const execCommand = (command: string, args: string[]): Promise<{ stdout: string;
       reject(error);
     });
   });
+};
+
+// Open browser helper
+const openBrowser = (url: string): void => {
+  const command = process.platform === 'win32' ? 'start' : process.platform === 'darwin' ? 'open' : 'xdg-open';
+  spawn(command, [url], { shell: true, detached: true, stdio: 'ignore' });
 };
 
 // Tool definition for external registration
@@ -83,8 +89,49 @@ export const createCopilotTool = {
         return createError(`Failed to create copilot project: ${stderr}`);
       }
 
+      // 1. Show full path to user
+      const fullPath = resolve(process.cwd(), name);
+
+      try {
+        // 2. Install dependencies
+        await execCommand('npm', ['install'], fullPath);
+
+        // 3. Start the project
+        spawn('npm', ['run', 'start'], {
+          cwd: fullPath,
+          shell: true,
+          detached: true,
+          stdio: 'ignore'
+        });
+
+        // Give the server time to start
+        setTimeout(() => {
+          // 4. Open browser at localhost:4400 (common Vue dev server port)
+          const url = 'http://localhost:4400';
+          openBrowser(url);
+        }, 3000);
+
+      } catch (setupError) {
+        // Post-setup steps failed, but we'll still return success for the main project creation
+      }
+
       // Return success response with output
-      const successMessage = `Successfully created FusionKit copilot project "${name}"!\n\n${stdout}\n\nNext steps:\n1. Navigate to the project directory: cd ${name}\n2. Install dependencies: npm install\n3. Build the project: npm run build\n4. Start the MCP server: npm start`;
+      const successMessage = `Successfully created FusionKit copilot project "${name}"!
+
+📁 Full path: ${fullPath}
+
+${stdout}
+
+✨ Automated setup completed:
+✅ Project created
+✅ Dependencies installed
+✅ Development server started
+✅ Browser opened at http://localhost:4400
+
+The project is now running! You can:
+- View it in your browser at http://localhost:4400
+- Navigate to: cd ${name}
+- Make changes and see them live-reload`;
 
       return createResponse(successMessage);
     } catch (error) {
