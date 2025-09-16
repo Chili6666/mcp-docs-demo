@@ -4,7 +4,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 export const registerMainDocsResource = async (mcpServer: McpServer): Promise<void> => {
-  const docsPath = 'D:/dev/myGithub/mcp-docs-demo/docs';
+  const docsPath = path.join(__dirname, '../../docs');
 
   try {
     await fs.access(docsPath);

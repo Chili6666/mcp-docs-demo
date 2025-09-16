@@ -1,5 +1,6 @@
 // FusionKit Documentation Tools
 import { join } from 'path';
+import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { DocIndexer, IndexedDocs } from '../utils/docIndexer.js';
@@ -32,9 +33,9 @@ interface CodeExample {
   code: string;
 }
 
-// Initialize the doc indexer with absolute path
-// The MCP server might run from a different working directory, so we use absolute path
-const docsPath = 'D:/dev/myGithub/mcp-docs-demo/docs';
+// Initialize the doc indexer with relative path to dist folder
+// The MCP server runs from dist/src/tools/ so docs are at ../../docs
+const docsPath = path.join(__dirname, '../../docs');
 const docIndexer = new DocIndexer(docsPath);
 
 // Get fresh docs every time (no caching for development)
